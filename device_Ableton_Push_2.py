@@ -1,5 +1,5 @@
 # name=Ableton Push 2
-# url=
+# url=https://github.com/flstudio-midi-scripts/AbletonPush2
 
 import playlist
 import channels
@@ -38,17 +38,19 @@ class AbletonPush():
         pass
 
     def OnInit(self):
-        print("Ableton Push 2 controller script for Image-Line FL Studio Init")
         for control in controls.values():
             updateLED(control)
 
     def OnDeInit(self):
-        print("Ableton Push 2 controller script for Image-Line FL Studio DeInit")
         for control in controls.values():
             updateLED(control, 0)
 
     def OnMidiIn(self, event):
         if event.status == midi.MIDI_ACTIVESENSING: event.handled = True
+
+    def OnRefresh(self, flags):
+        if flags & midi.HW_Dirty_LEDs:
+            self.updateLEDs()
 
     def OnMidiMsg(self, event):
         for control in controls.values():
@@ -56,64 +58,59 @@ class AbletonPush():
             control_id = int(control_id)
             control_note_or_color = int(control_note_or_color)
             if control_type == "Button" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id and event.data2 == 127:
-                self.dispatch(f'On{control_type}{control_name}Pressed', control)
+                self.dispatch(f'On{control_type}{control_name}Pressed')
             elif control_type == "Button" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id and event.data2 == 0:
-                self.dispatch(f'On{control_type}{control_name}Released', control)
+                self.dispatch(f'On{control_type}{control_name}Released')
             elif control_type == "Pad" and event.status == 144 and event.data1 == control_id:
-                self.dispatch(f'On{control_type}{control_name}Pressed', control)
+                self.dispatch(f'On{control_type}{control_name}Pressed')
             elif control_type == "Pad" and event.status == 128 and event.data1 == control_id:
-                self.dispatch(f'On{control_type}{control_name}Released', control)
+                self.dispatch(f'On{control_type}{control_name}Released')
             elif control_type == "Encoder" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id and event.data2 == 1:
-                self.dispatch(f'On{control_type}{control_name}Increased', control)
+                self.dispatch(f'On{control_type}{control_name}Increased')
             elif control_type == "Encoder" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id and event.data2 == 127:
-                self.dispatch(f'On{control_type}{control_name}Decreased', control)
+                self.dispatch(f'On{control_type}{control_name}Decreased')
             elif control_type == "Encoder" and event.status == midi.MIDI_NOTEON and event.data1 == control_note_or_color and event.data2 == 127:
-                self.dispatch(f'On{control_type}{control_name}Touched', control)
+                self.dispatch(f'On{control_type}{control_name}Touched')
             elif control_type == "Encoder" and event.status == midi.MIDI_NOTEON and event.data1 == control_note_or_color and event.data2 == 0:
-                self.dispatch(f'On{control_type}{control_name}Released', control)
+                self.dispatch(f'On{control_type}{control_name}Released')
             elif control_type == "Touchstrip" and event.status == midi.MIDI_PITCHBEND:
-                self.dispatch(f'OnPitchbend', control)
+                self.dispatch(f'OnPitchbend')
             elif control_type == "Touchstrip" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id:
-                self.dispatch(f'OnModwheel', control)
+                self.dispatch(f'OnModwheel')
             elif control_type == "Touchstrip" and event.status == midi.MIDI_NOTEON and event.data1 == control_note_or_color and event.data2 == 127:
-                self.dispatch(f'OnTouchstripTouched', control)
+                self.dispatch(f'OnTouchstripTouched')
             elif control_type == "Touchstrip" and event.status == midi.MIDI_NOTEON and event.data1 == control_note_or_color and event.data2 == 0:
-                self.dispatch(f'OnTouchstripReleased', control)
+                self.dispatch(f'OnTouchstripReleased')
         event.handled = True
         print(event.status, event.data1, event.data2)
 
-    def OnButtonPlayPressed(self, control):
+    def OnButtonPlayPressed(self):
         if transport.isPlaying():
             transport.stop()
         else:
             transport.start()
 
-    def OnButtonDoubleLoopPressed(self, control):
+    def OnButtonDoubleLoopPressed(self):
         transport.setLoopMode()
 
-    def OnEncoderMasterIncreased(self, control):
+    def OnEncoderMasterIncreased(self):
         vol = round(mixer.getTrackVolume(0), 3)
         vol = vol + 0.005 if vol < 1.0 else 1.0
         mixer.setTrackVolume(0, vol)
 
-    def OnEncoderMasterDecreased(self, control):
+    def OnEncoderMasterDecreased(self):
         vol = round(mixer.getTrackVolume(0), 3)
         vol = vol - 0.005 if vol > 0.0 else 0.0
         mixer.setTrackVolume(0, vol)
 
-    def OnButtonRecordPressed(self, control):
+    def OnButtonRecordPressed(self):
         transport.record()
 
-    def dispatch(self, func, control):
+    def dispatch(self, func):
         if hasattr(self, func):
-            # print(f'Call {func}')
-            getattr(self, func)(control)
+            getattr(self, func)()
         else:
             print(f'Call to {func} not yet implemented!')
-
-    def OnRefresh(self, flags):
-        if flags & midi.HW_Dirty_LEDs:
-            self.updateLEDs()
 
     def updateLEDs(self):
         if device.isAssigned():
