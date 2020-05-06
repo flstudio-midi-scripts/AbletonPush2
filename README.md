@@ -1,6 +1,4 @@
-# AbletonPush2
-
-FL Studio MIDI script for Ableton Push 2
+# FL Studio MIDI script for Ableton Push 2
 
 ## Controls
 
@@ -20,4 +18,4 @@ FL Studio MIDI script for Ableton Push 2
 
 ## TODO
 
-Pretty much everything! :)
+- [] Pretty much everything! :)
