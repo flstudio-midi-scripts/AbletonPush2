@@ -35,7 +35,7 @@ def updateLED(control, color = None, animation = 0):
 
 class AbletonPush():
     def __init__(self):
-        pass
+        self.isButtonShiftPressed = False
 
     def OnInit(self):
         for control in controls.values():
@@ -103,8 +103,19 @@ class AbletonPush():
         vol = vol - 0.005 if vol > 0.0 else 0.0
         mixer.setTrackVolume(0, vol)
 
+    def OnEncoderMasterTouched(self):
+        if self.isButtonShiftPressed: mixer.setTrackVolume(0, 1.0)
+
     def OnButtonRecordPressed(self):
         transport.record()
+
+    def OnButtonShiftPressed(self):
+        self.isButtonShiftPressed = True
+        updateLED(controls.BUTTON_SHIFT, colors.BW_WHITE)
+
+    def OnButtonShiftReleased(self):
+        self.isButtonShiftPressed = False
+        updateLED(controls.BUTTON_SHIFT)
 
     def dispatch(self, func):
         if hasattr(self, func):
