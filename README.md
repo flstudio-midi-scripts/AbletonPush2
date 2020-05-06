@@ -5,7 +5,7 @@
 * Play button: Toggle play/stop (green when playing in song mode, orange in pattern mode)
 * Record button: Toggle record on/off
 * Double Loop button: Toggle song/pattern mode
-* Master encoder: Set master volume (Shift + touch encoder to reset volume to 100%)
+* Master encoder: Change master volume (Shift + touch encoder to reset volume to 100%)
 
 ## References
 
