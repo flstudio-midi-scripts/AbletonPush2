@@ -127,9 +127,9 @@ class AbletonPush():
         if device.isAssigned():
             # play
             if transport.isPlaying() and transport.getLoopMode():
-                updateLED(controls.BUTTON_PLAY, colors.RGB_GREEN)
+                updateLED(controls.BUTTON_PLAY, colors.RGB_GREEN, animations.PULSING_QUARTER)
             elif transport.isPlaying():
-                updateLED(controls.BUTTON_PLAY, colors.RGB_ORANGE)
+                updateLED(controls.BUTTON_PLAY, colors.RGB_ORANGE, animations.PULSING_QUARTER)
             else:
                 updateLED(controls.BUTTON_PLAY)
 
