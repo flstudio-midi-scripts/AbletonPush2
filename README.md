@@ -18,4 +18,4 @@
 
 ## TODO
 
-- [] Pretty much everything! :)
+- [ ] Pretty much everything! :)
