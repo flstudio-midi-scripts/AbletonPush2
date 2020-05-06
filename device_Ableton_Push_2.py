@@ -22,9 +22,9 @@ def updateLED(control, color = None, animation = 0):
         control_type, control_name, control_id, control_note_or_color = control.split(".")
         control_id = int(control_id)
         control_note_or_color = int(control_note_or_color)
-        is_rgb = bool(control_note_or_color)
+        isRGB = bool(control_note_or_color)
         if color is None:
-            if is_rgb:
+            if isRGB:
                 color = colors.RGB_DARK_GRAY
             else:
                 color = colors.BW_DARK_GRAY
@@ -53,73 +53,95 @@ class AbletonPush():
             self.updateLEDs()
 
     def OnMidiMsg(self, event):
+        event.handled = True
         for control in controls.values():
             control_type, control_name, control_id, control_note_or_color = control.split(".")
             control_id = int(control_id)
             control_note_or_color = int(control_note_or_color)
             if control_type == "Button" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id and event.data2 == 127:
-                self.dispatch(f'On{control_type}{control_name}Pressed')
+                self.dispatch(f'On{control_type}{control_name}Pressed', control, event)
             elif control_type == "Button" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id and event.data2 == 0:
-                self.dispatch(f'On{control_type}{control_name}Released')
+                self.dispatch(f'On{control_type}{control_name}Released', control, event)
             elif control_type == "Pad" and event.status == 144 and event.data1 == control_id:
-                self.dispatch(f'On{control_type}{control_name}Pressed')
+                self.dispatch(f'On{control_type}{control_name}Pressed', control, event)
             elif control_type == "Pad" and event.status == 128 and event.data1 == control_id:
-                self.dispatch(f'On{control_type}{control_name}Released')
+                self.dispatch(f'On{control_type}{control_name}Released', control, event)
             elif control_type == "Encoder" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id and event.data2 == 1:
-                self.dispatch(f'On{control_type}{control_name}Increased')
+                self.dispatch(f'On{control_type}{control_name}Increased', control, event)
             elif control_type == "Encoder" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id and event.data2 == 127:
-                self.dispatch(f'On{control_type}{control_name}Decreased')
+                self.dispatch(f'On{control_type}{control_name}Decreased', control, event)
             elif control_type == "Encoder" and event.status == midi.MIDI_NOTEON and event.data1 == control_note_or_color and event.data2 == 127:
-                self.dispatch(f'On{control_type}{control_name}Touched')
+                self.dispatch(f'On{control_type}{control_name}Touched', control, event)
             elif control_type == "Encoder" and event.status == midi.MIDI_NOTEON and event.data1 == control_note_or_color and event.data2 == 0:
-                self.dispatch(f'On{control_type}{control_name}Released')
+                self.dispatch(f'On{control_type}{control_name}Released', control, event)
             elif control_type == "Touchstrip" and event.status == midi.MIDI_PITCHBEND:
-                self.dispatch(f'OnPitchbend')
+                event.handled = False # self.dispatch(f'OnPitchbend', control, event)
             elif control_type == "Touchstrip" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id:
-                self.dispatch(f'OnModwheel')
+                event.handled = False # self.dispatch(f'OnModwheel', control, event)
             elif control_type == "Touchstrip" and event.status == midi.MIDI_NOTEON and event.data1 == control_note_or_color and event.data2 == 127:
-                self.dispatch(f'OnTouchstripTouched')
+                self.dispatch(f'OnTouchstripTouched', control, event)
             elif control_type == "Touchstrip" and event.status == midi.MIDI_NOTEON and event.data1 == control_note_or_color and event.data2 == 0:
-                self.dispatch(f'OnTouchstripReleased')
-        event.handled = True
-        print(event.status, event.data1, event.data2)
+                self.dispatch(f'OnTouchstripReleased', control, event)
+        # print(event.status, event.data1, event.data2)
 
-    def OnButtonPlayPressed(self):
+    def OnButtonPlayPressed(self, control, event):
         if transport.isPlaying():
             transport.stop()
         else:
             transport.start()
 
-    def OnButtonDoubleLoopPressed(self):
+    def OnButtonDoubleLoopPressed(self, control, event):
         transport.setLoopMode()
 
-    def OnEncoderMasterIncreased(self):
+    def OnEncoderMasterIncreased(self, control, event):
+        # ui.showWindow(midi.widMixer)
         vol = round(mixer.getTrackVolume(0), 3)
         vol = vol + 0.005 if vol < 1.0 else 1.0
         mixer.setTrackVolume(0, vol)
 
-    def OnEncoderMasterDecreased(self):
+    def OnEncoderMasterDecreased(self, control, event):
+        # ui.showWindow(midi.widMixer)
         vol = round(mixer.getTrackVolume(0), 3)
         vol = vol - 0.005 if vol > 0.0 else 0.0
         mixer.setTrackVolume(0, vol)
 
-    def OnEncoderMasterTouched(self):
+    def OnEncoderMasterTouched(self, control, event):
+        # ui.showWindow(midi.widMixer)
         if self.isButtonShiftPressed: mixer.setTrackVolume(0, 1.0)
 
-    def OnButtonRecordPressed(self):
+    def OnButtonRecordPressed(self, control, event):
         transport.record()
 
-    def OnButtonShiftPressed(self):
-        self.isButtonShiftPressed = True
+    def OnButtonMetronomePressed(self, control, event):
+        pass
+
+    def OnButtonShiftPressed(self, control, event):
         updateLED(controls.BUTTON_SHIFT, colors.BW_WHITE)
+        self.isButtonShiftPressed = True
 
-    def OnButtonShiftReleased(self):
-        self.isButtonShiftPressed = False
+    def OnButtonShiftReleased(self, control, event):
         updateLED(controls.BUTTON_SHIFT)
+        self.isButtonShiftPressed = False
 
-    def dispatch(self, func):
+    # show/hide channel rack
+    def OnButtonDevicePressed(self, control, event):
+        transport.globalTransport(midi.FPT_F6, event.pmeFlags)
+
+    # show/hide mixer
+    def OnButtonMixPressed(self, control, event):
+        transport.globalTransport(midi.FPT_F9, event.pmeFlags)
+
+    # show/hide piano roll
+    def OnButtonClipPressed(self, control, event):
+        transport.globalTransport(midi.FPT_F7, event.pmeFlags)
+
+    # show/hide browser
+    def OnButtonBrowsePressed(self, control, event):
+        pass
+
+    def dispatch(self, func, control, event):
         if hasattr(self, func):
-            getattr(self, func)()
+            getattr(self, func)(control, event)
         else:
             print(f'Call to {func} not yet implemented!')
 
@@ -144,6 +166,30 @@ class AbletonPush():
                 updateLED(controls.BUTTON_DOUBLE_LOOP)
             else:
                 updateLED(controls.BUTTON_DOUBLE_LOOP, colors.BW_WHITE)
+
+            # metronome
+            if ui.isMetronomeEnabled():
+                updateLED(controls.BUTTON_METRONOME, colors.BW_WHITE)
+            else:
+                updateLED(controls.BUTTON_METRONOME)
+
+            # device/channel rack
+            if ui.getFocused(midi.widChannelRack):
+                updateLED(controls.BUTTON_DEVICE, colors.BW_WHITE)
+            else:
+                updateLED(controls.BUTTON_DEVICE)
+
+            # mixer
+            if ui.getFocused(midi.widMixer):
+                updateLED(controls.BUTTON_MIX, colors.BW_WHITE)
+            else:
+                updateLED(controls.BUTTON_MIX)
+
+            # clip/piano roll
+            if ui.getFocused(midi.widPianoRoll):
+                updateLED(controls.BUTTON_CLIP, colors.BW_WHITE)
+            else:
+                updateLED(controls.BUTTON_CLIP)
 
 
 ap = AbletonPush()
