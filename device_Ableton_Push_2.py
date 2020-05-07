@@ -17,6 +17,40 @@ import utils
 
 from constants import *
 
+def getClosestColor(RGBAInt):
+    # http://www.shodor.org/stella2java/rgbint.html
+
+    # def Int2RGBA(RGBAInt):
+    #     blue = RGBAInt & 255
+    #     green = (RGBAInt >> 8) & 255
+    #     red = (RGBAInt >> 16) & 255
+    #     alpha = (RGBAInt >> 24) & 255
+    #     return red, green, blue, alpha
+
+    # def RGBA2Int(rgba):
+    #     red = rgba[0]
+    #     green = rgba[1]
+    #     blue = rgba[2]
+    #     alpha = rgba[3]
+    #     RGBAInt = (alpha<<24) + (red<<16) + (green<<8) + blue
+    #     return RGBAInt
+
+    r1 = (RGBAInt >> 16) & 255
+    g1 = (RGBAInt >> 8) & 255
+    b1 = RGBAInt & 255
+
+    d = {}
+
+    # https://stackoverflow.com/questions/1847092/given-an-rgb-value-what-would-be-the-best-way-to-find-the-closest-match-in-the-d
+    for color, rgb in colors.RGB_MAP.items():
+        r2 = rgb[0]
+        g2 = rgb[1]
+        b2 = rgb[2]
+        d[color] = (r2-r1)**2 + (g2-g1)**2 + (b2-b1)**2
+        # d[color] = ((r2-r1)*0.30)**2 + ((g2-g1)*0.59)**2 + ((b2-b1)*0.11)**2
+
+    return min(d, key=d.get)
+
 def updateLED(control, color = None, animation = 0):
     if device.isAssigned():
         control_type, control_name, control_id, control_note_or_color = control.split(".")
@@ -49,7 +83,7 @@ class AbletonPush():
         if event.status == midi.MIDI_ACTIVESENSING: event.handled = True
 
     def OnRefresh(self, flags):
-        if flags & midi.HW_Dirty_LEDs:
+        if flags and midi.HW_Dirty_LEDs:
             self.updateLEDs()
 
     def OnMidiMsg(self, event):
@@ -137,7 +171,8 @@ class AbletonPush():
 
     # show/hide browser
     def OnButtonBrowsePressed(self, control, event):
-        pass
+        print("browser visible", ui.getVisible(midi.widBrowser))
+        print("browser focused", ui.getFocused(midi.widBrowser))
 
     def dispatch(self, func, control, event):
         if hasattr(self, func):
@@ -147,7 +182,7 @@ class AbletonPush():
 
     def updateLEDs(self):
         if device.isAssigned():
-            # play
+            # play button
             if transport.isPlaying() and transport.getLoopMode():
                 updateLED(controls.BUTTON_PLAY, colors.RGB_GREEN, animations.PULSING_QUARTER)
             elif transport.isPlaying():
@@ -155,42 +190,54 @@ class AbletonPush():
             else:
                 updateLED(controls.BUTTON_PLAY)
 
-            # record
+            # record button
             if transport.isRecording():
                 updateLED(controls.BUTTON_RECORD, colors.RGB_RED)
             else:
                 updateLED(controls.BUTTON_RECORD)
 
-            # loop
+            # double loop [song/pattern] button
             if transport.getLoopMode():
                 updateLED(controls.BUTTON_DOUBLE_LOOP)
             else:
                 updateLED(controls.BUTTON_DOUBLE_LOOP, colors.BW_WHITE)
 
-            # metronome
+            # metronome button
             if ui.isMetronomeEnabled():
                 updateLED(controls.BUTTON_METRONOME, colors.BW_WHITE)
             else:
                 updateLED(controls.BUTTON_METRONOME)
 
-            # device/channel rack
+            # device [channel rack] button
             if ui.getFocused(midi.widChannelRack):
                 updateLED(controls.BUTTON_DEVICE, colors.BW_WHITE)
             else:
                 updateLED(controls.BUTTON_DEVICE)
 
-            # mixer
+            # mix [mixer] button
             if ui.getFocused(midi.widMixer):
                 updateLED(controls.BUTTON_MIX, colors.BW_WHITE)
             else:
                 updateLED(controls.BUTTON_MIX)
 
-            # clip/piano roll
+            # clip [piano roll] button
             if ui.getFocused(midi.widPianoRoll):
                 updateLED(controls.BUTTON_CLIP, colors.BW_WHITE)
             else:
                 updateLED(controls.BUTTON_CLIP)
 
+            # browse [browser] button
+            if ui.getFocused(midi.widBrowser):
+                updateLED(controls.BUTTON_BROWSE, colors.BW_WHITE)
+            else:
+                updateLED(controls.BUTTON_BROWSE)
+
+            # pads
+            for idx, pad in enumerate(PADS_64, 1):
+                if idx <= patterns.patternCount():
+                    updateLED(pad, getClosestColor(patterns.getPatternColor(idx)))
+                else:
+                    updateLED(pad, 0)
 
 ap = AbletonPush()
 
