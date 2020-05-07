@@ -97,9 +97,9 @@ class AbletonPush():
             elif control_type == "Button" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id and event.data2 == 0:
                 self.dispatch(f'On{control_type}{control_name}Released', control, event)
             elif control_type == "Pad" and event.status == 144 and event.data1 == control_id:
-                self.dispatch(f'On{control_type}{control_name}Pressed', control, event)
+                self.dispatch(f'On{control_type}Pressed', control, event)
             elif control_type == "Pad" and event.status == 128 and event.data1 == control_id:
-                self.dispatch(f'On{control_type}{control_name}Released', control, event)
+                self.dispatch(f'On{control_type}Released', control, event)
             elif control_type == "Encoder" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id and event.data2 == 1:
                 self.dispatch(f'On{control_type}{control_name}Increased', control, event)
             elif control_type == "Encoder" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id and event.data2 == 127:
@@ -174,12 +174,19 @@ class AbletonPush():
         print("browser visible", ui.getVisible(midi.widBrowser))
         print("browser focused", ui.getFocused(midi.widBrowser))
 
+    # select pattern corresponding to pad when pressed
+    def OnPadPressed(self, control, event):
+        idx = PADS_64.index(control) + 1
+        patterns.jumpToPattern(idx)
+
+    # dispatch event to appropriate control handler
     def dispatch(self, func, control, event):
         if hasattr(self, func):
             getattr(self, func)(control, event)
         else:
             print(f'Call to {func} not yet implemented!')
 
+    # update LEDs
     def updateLEDs(self):
         if device.isAssigned():
             # play button
