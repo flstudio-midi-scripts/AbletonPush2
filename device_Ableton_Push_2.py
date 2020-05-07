@@ -88,8 +88,12 @@ class AbletonPush():
         if event.status == midi.MIDI_ACTIVESENSING: event.handled = True
 
     def OnRefresh(self, flags):
-        if flags and midi.HW_Dirty_LEDs:
-            self.updateLEDs()
+        # if flags and midi.HW_Dirty_LEDs:
+        self.updateLEDs()
+
+    def OnDirtyMixerTrack(self, lastTrack):
+        pass
+        # self.updateLEDs()
 
     def OnMidiMsg(self, event):
         event.handled = True
@@ -247,7 +251,14 @@ class AbletonPush():
             # pads
             for idx, pad in enumerate(PADS_64, 1):
                 if idx <= patterns.patternCount():
-                    updateLED(pad, getClosestColor(patterns.getPatternColor(idx)))
+                    if (idx == patterns.patternNumber()):
+                        if transport.isPlaying():
+                            updateLED(pad, colors.RGB_GREEN, animations.PULSING_QUARTER)
+                        else:
+                            updateLED(pad, 0)
+                            updateLED(pad, getClosestColor(patterns.getPatternColor(idx)), animations.BLINKING_HALF)
+                    else:
+                        updateLED(pad, getClosestColor(patterns.getPatternColor(idx)))
                 else:
                     updateLED(pad, 0)
 
@@ -259,8 +270,8 @@ def OnInit():
 def OnDeInit():
     ap.OnDeInit()
 
-def OnIdle():
-    pass
+# def OnIdle():
+#     print("OnIdle")
 
 def OnMidiIn(event):
     ap.OnMidiIn(event)
@@ -269,55 +280,56 @@ def OnMidiMsg(event):
     ap.OnMidiMsg(event)
 
 # def OnMidiOutMsg(event):
-#     pass
+#     print("OnMidiOutMsg")
 
 # def OnNoteOn(event):
-#     pass
+#     print("OnNoteOn")
 
 # def OnNoteOff(event):
-#     pass
+#     print("OnNoteOff")
 
 # def OnControlChange(event):
-#     pass
+#     print("OnControlChange")
 
 # def OnProgramChange(event):
-#     pass
+#     print("OnProgramChange")
 
 # def OnPitchBend(event):
-#     pass
+#     print("OnPitchBend")
 
 # def OnKeyPressure(event):
-#     pass
+#     print("OnKeyPressure")
 
 # def OnChannelPressure(event):
-#     pass
+#     print("OnChannelPressure")
 
 # def OnSysEx(event):
-#     pass
+#     print("OnSysEx")
 
 def OnRefresh(flags):
+    print("OnRefresh")
     ap.OnRefresh(flags)
 
 # def OnDoFullRefresh():
-#     pass
+#     print("OnDoFullRefresh")
 
 # def OnUpdateBeatIndicator(value):
-#     pass
+#     print("OnUpdateBeatIndicator")
 
 # def OnDisplayZone():
-#     pass
+#     print("OnDisplayZone")
 
 # def OnUpdateLiveMode(lastTrack):
-#     pass
+#     print("OnUpdateLiveMode")
 
 # def OnDirtyMixerTrack():
-#     pass
+#     print("OnDirtyMixerTrack")
 
 # def OnUpdateMeters():
-#     pass
+#     print("OnUpdateMeters")
 
 # def OnWaitingForInput():
-#     pass
+#     print("OnWaitingForInput")
 
 # def OnSendTempMsg(message, duration):
-#     pass
+#     print("OnSendTempMsg")
