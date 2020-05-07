@@ -200,9 +200,9 @@ class AbletonPush():
         if device.isAssigned():
             # play button
             if transport.isPlaying() and transport.getLoopMode():
-                updateLED(controls.BUTTON_PLAY, colors.RGB_GREEN, animations.PULSING_QUARTER)
+                updateLED(controls.BUTTON_PLAY, colors.RGB_GREEN, animations.BLINKING_QUARTER)
             elif transport.isPlaying():
-                updateLED(controls.BUTTON_PLAY, colors.RGB_ORANGE, animations.PULSING_QUARTER)
+                updateLED(controls.BUTTON_PLAY, colors.RGB_ORANGE, animations.BLINKING_QUARTER)
             else:
                 updateLED(controls.BUTTON_PLAY)
 
@@ -253,10 +253,11 @@ class AbletonPush():
                 if idx <= patterns.patternCount():
                     if (idx == patterns.patternNumber()):
                         if transport.isPlaying():
-                            updateLED(pad, colors.RGB_GREEN, animations.PULSING_QUARTER)
+                            updateLED(pad, 0)
+                            updateLED(pad, getClosestColor(patterns.getPatternColor(idx)), animations.BLINKING_QUARTER)
                         else:
                             updateLED(pad, 0)
-                            updateLED(pad, getClosestColor(patterns.getPatternColor(idx)), animations.BLINKING_HALF)
+                            updateLED(pad, getClosestColor(patterns.getPatternColor(idx)), animations.PULSING_HALF)
                     else:
                         updateLED(pad, getClosestColor(patterns.getPatternColor(idx)))
                 else:
