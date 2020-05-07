@@ -17,38 +17,43 @@ import utils
 
 from constants import *
 
-def getClosestColor(RGBAInt):
+def getClosestColor(Int):
+    # TODO Create and send custom color palette to Push to match the colors in the FL project (https://github.com/Ableton/push-interface/issues/2)
+
     # http://www.shodor.org/stella2java/rgbint.html
-
-    # def Int2RGBA(RGBAInt):
-    #     blue = RGBAInt & 255
-    #     green = (RGBAInt >> 8) & 255
-    #     red = (RGBAInt >> 16) & 255
-    #     alpha = (RGBAInt >> 24) & 255
+    # def Int2RGBA(Int):
+    #     blue = Int & 255
+    #     green = (Int >> 8) & 255
+    #     red = (Int >> 16) & 255
+    #     alpha = (Int >> 24) & 255
     #     return red, green, blue, alpha
+    #
+    # def RGBA2Int(RGBA):
+    #     red = RGBA[0]
+    #     green = RGBA[1]
+    #     blue = RGBA[2]
+    #     alpha = RGBA[3]
+    #     Int = (alpha<<24) + (red<<16) + (green<<8) + blue
+    #     return Int
 
-    # def RGBA2Int(rgba):
-    #     red = rgba[0]
-    #     green = rgba[1]
-    #     blue = rgba[2]
-    #     alpha = rgba[3]
-    #     RGBAInt = (alpha<<24) + (red<<16) + (green<<8) + blue
-    #     return RGBAInt
+    a1 = (Int >> 24) & 255
+    r1 = (Int >> 16) & 255
+    g1 = (Int >> 8) & 255
+    b1 = Int & 255
 
-    r1 = (RGBAInt >> 16) & 255
-    g1 = (RGBAInt >> 8) & 255
-    b1 = RGBAInt & 255
+    rgba = (r1, g1, b1, a1)
 
     d = {}
 
     # https://stackoverflow.com/questions/1847092/given-an-rgb-value-what-would-be-the-best-way-to-find-the-closest-match-in-the-d
-    for color, rgb in colors.RGB_MAP.items():
-        r2 = rgb[0]
-        g2 = rgb[1]
-        b2 = rgb[2]
-        d[color] = (r2-r1)**2 + (g2-g1)**2 + (b2-b1)**2
+    # https://matplotlib.org/api/colors_api.html
+    for color, RGBA in colors.RGB_MAP.items():
+        r2 = RGBA[0]
+        g2 = RGBA[1]
+        b2 = RGBA[2]
+        a2 = RGBA[3]
         # d[color] = ((r2-r1)*0.30)**2 + ((g2-g1)*0.59)**2 + ((b2-b1)*0.11)**2
-
+        d[color] = (r2-r1)**2 + (g2-g1)**2 + (b2-b1)**2
     return min(d, key=d.get)
 
 def updateLED(control, color = None, animation = 0):
