@@ -166,6 +166,18 @@ class AbletonPush():
         else:
             ui.snapOnOff()
 
+    # undo button
+    def OnButtonUndoPressed(self, control, event):
+        updateLED(controls.BUTTON_UNDO, colors.BW_WHITE)
+        if self.isButtonShiftPressed:
+            general.undoDown()
+        else:
+            general.undoUp()
+
+    def OnButtonUndoReleased(self, control, event):
+        updateLED(controls.BUTTON_UNDO)
+
+    # shift button
     def OnButtonShiftPressed(self, control, event):
         updateLED(controls.BUTTON_SHIFT, colors.BW_WHITE)
         self.isButtonShiftPressed = True
@@ -257,7 +269,6 @@ class AbletonPush():
                 updateLED(controls.BUTTON_BROWSE)
 
             # quantize/snap button
-            print(ui.getSnapMode())
             if ui.getSnapMode() != 3:
                 updateLED(controls.BUTTON_QUANTIZE, colors.BW_WHITE)
             else:
