@@ -17,6 +17,13 @@
 * https://github.com/ffont/push2-python
 * https://github.com/soundwrightpro/FLIN
 
-## TODO
+## Features
 
+- [X] Press Play button -> play/stop (blinking green/orange when playing in song/pattern mode)
+- [X] Press Record button -> toggle record
+- [X] Press Double Loop button -> song/pattern mode
+- [X] Press Quantize button -> snap on/off (press Shift + Quantize button -> select snap mode)
+- [X] Press Device/Mix/Browse/Clip button -> show/hide channel rack/mixer/browser/piano roll
+- [X] 8x8 pad grid shows up to 64 patterns and hitting the pad selects the corresponding pattern
+- [X] Rotate Master encoder -> change master volume (press Shift button + touch Master encoder -> reset master volume to 100%)
 - [ ] Pretty much everything! :)
