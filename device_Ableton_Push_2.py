@@ -177,9 +177,8 @@ class AbletonPush():
 
     # tempo encoder
     def OnEncoderTempoIncreased(self, control, event):
-        if self.isButtonShiftPressed: # TODO change tempo when avail in API
-            # transport.globalTransport(midi.FPT_NudgePlus, event.pmeFlags)
-            pass
+        if self.isButtonShiftPressed:
+            transport.globalTransport(midi.FPT_TempoJog, 10)
         else:
             if ui.getFocused(midi.widChannelRack):
                 pass
@@ -189,8 +188,7 @@ class AbletonPush():
 
     def OnEncoderTempoDecreased(self, control, event):
         if self.isButtonShiftPressed:
-            # transport.globalTransport(midi.FPT_NudgeMinus, event.pmeFlags)
-            pass
+            transport.globalTransport(midi.FPT_TempoJog, -10)
         else:
             if ui.getFocused(midi.widChannelRack):
                 pass
