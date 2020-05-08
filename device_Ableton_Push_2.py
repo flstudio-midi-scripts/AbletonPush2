@@ -78,11 +78,8 @@ class AbletonPush():
         self.isButtonShiftPressed = False
 
     def OnInit(self):
-        for key, control in controls.items():
-            if key.startswith("PAD"):
-                updateLED(control, 0)
-            else:
-                updateLED(control)
+        for control in controls.values():
+            updateLED(control)
 
     def OnDeInit(self):
         for control in controls.values():
@@ -161,6 +158,13 @@ class AbletonPush():
 
     def OnButtonMetronomePressed(self, control, event):
         pass
+
+    # quantize/snap button
+    def OnButtonQuantizePressed(self, control, event):
+        if self.isButtonShiftPressed:
+            ui.snapMode(1)
+        else:
+            ui.snapOnOff()
 
     def OnButtonShiftPressed(self, control, event):
         updateLED(controls.BUTTON_SHIFT, colors.BW_WHITE)
@@ -251,6 +255,13 @@ class AbletonPush():
                 updateLED(controls.BUTTON_BROWSE, colors.BW_WHITE)
             else:
                 updateLED(controls.BUTTON_BROWSE)
+
+            # quantize/snap button
+            print(ui.getSnapMode())
+            if ui.getSnapMode() != 3:
+                updateLED(controls.BUTTON_QUANTIZE, colors.BW_WHITE)
+            else:
+                updateLED(controls.BUTTON_QUANTIZE)
 
             # pads
             for idx, pad in enumerate(PADS_64, 1):
