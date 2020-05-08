@@ -1,11 +1,15 @@
 # FL Studio MIDI script for Ableton Push 2
 
-## Controls
+## Features
 
-* Play button: Toggle play/stop (green when playing in song mode, orange in pattern mode)
-* Record button: Toggle record on/off
-* Double Loop button: Toggle song/pattern mode
-* Master encoder: Change master volume (Shift + touch encoder to reset volume to 100%)
+- [X] Press Play button -> play/stop (blinking green/orange when playing in song/pattern mode)
+- [X] Press Record button -> toggle record
+- [X] Press Double Loop button -> song/pattern mode
+- [X] Press Quantize button -> snap on/off (press Shift + Quantize button -> select snap mode)
+- [X] Press Device/Mix/Browse/Clip button -> show/hide channel rack/mixer/browser/piano roll
+- [X] 8x8 pad grid shows up to 64 patterns and hitting the pad selects the corresponding pattern
+- [X] Rotate Master encoder -> change master volume (press Shift button + touch Master encoder -> reset master volume to 100%)
+- [ ] Pretty much everything! :)
 
 ## References
 
@@ -17,13 +21,3 @@
 * https://github.com/ffont/push2-python
 * https://github.com/soundwrightpro/FLIN
 
-## Features
-
-- [X] Press Play button -> play/stop (blinking green/orange when playing in song/pattern mode)
-- [X] Press Record button -> toggle record
-- [X] Press Double Loop button -> song/pattern mode
-- [X] Press Quantize button -> snap on/off (press Shift + Quantize button -> select snap mode)
-- [X] Press Device/Mix/Browse/Clip button -> show/hide channel rack/mixer/browser/piano roll
-- [X] 8x8 pad grid shows up to 64 patterns and hitting the pad selects the corresponding pattern
-- [X] Rotate Master encoder -> change master volume (press Shift button + touch Master encoder -> reset master volume to 100%)
-- [ ] Pretty much everything! :)
