@@ -8,8 +8,10 @@
 - [X] Press Quantize button -> snap on/off (press Shift + Quantize button -> select snap mode)
 - [X] Press Device/Mix/Browse/Clip button -> show/hide channel rack/mixer/browser/piano roll
 - [X] 8x8 pad grid shows up to 64 patterns and hitting the pad selects the corresponding pattern
-- [X] Rotate Master encoder -> change master volume (press Shift button + touch Master encoder -> reset master volume to 100%)
-- [ ] Pretty much everything remains to be implemented! At this stage this is to be considered for educational purposes only :)
+- [X] Rotate Tempo encoder -> change selected track (TODO: press Shift button to change tempo)
+- [X] Rotate Master encoder -> change master volume (press Shift button to change master pan)
+- [X] Rotate 1-8 encoder -> change track 1-8 volume (press Shift button to change master pan) where track 1 is the selected track
+- [ ] Pretty much everything remains to be implemented (particularly the implementation of performance pad mode as on the launchpads)! At this stage this is to be considered for educational purposes only :)
 
 ## References
 

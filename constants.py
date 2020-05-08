@@ -2,6 +2,9 @@ class AttrDict(dict):
     __getattr__ = dict.__getitem__
     __setattr__ = dict.__setitem__
 
+VOL_INC = 0.0066
+PAN_INC = 0.0066
+
 colors = AttrDict()
 colors.RGB_BLACK = 0
 colors.RGB_WHITE = 122
