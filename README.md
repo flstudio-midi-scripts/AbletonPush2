@@ -7,6 +7,9 @@ Given the limited set of features implemented so far, at this stage this script 
 - [X] Press Play button -> play/stop (blinking green/orange when playing in song/pattern mode)
 - [X] Press Record button -> toggle record
 - [X] Press Double Loop button -> song/pattern mode
+- [X] Press Metronome button -> metronome on/off
+- [X] Press Tap Tempo button -> tap to set tempo
+- [X] Press Quantize button -> snap on/off (press Shift + Quantize button -> select snap mode)
 - [X] Press Quantize button -> snap on/off (press Shift + Quantize button -> select snap mode)
 - [X] Press Device/Mix/Browse/Clip button -> show/hide channel rack/mixer/browser/piano roll
 - [X] 8x8 pad grid shows up to 64 patterns and hitting the pad selects the corresponding pattern
