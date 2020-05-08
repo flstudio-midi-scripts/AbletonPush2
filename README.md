@@ -1,6 +1,6 @@
 # FL Studio MIDI script for Ableton Push 2
 
-## Features
+## Features/TODO
 
 - [X] Press Play button -> play/stop (blinking green/orange when playing in song/pattern mode)
 - [X] Press Record button -> toggle record
@@ -9,7 +9,7 @@
 - [X] Press Device/Mix/Browse/Clip button -> show/hide channel rack/mixer/browser/piano roll
 - [X] 8x8 pad grid shows up to 64 patterns and hitting the pad selects the corresponding pattern
 - [X] Rotate Master encoder -> change master volume (press Shift button + touch Master encoder -> reset master volume to 100%)
-- [ ] Pretty much everything! :)
+- [ ] Pretty much everything! At this stage this is to be considered for educational purposes only :)
 
 ## References
 
