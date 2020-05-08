@@ -1,10 +1,8 @@
-class AttributeDict(dict):
-    def __getattr__(self, key):
-        return self[key]
-    def __setattr__(self, key, value):
-        self[key] = value
+class AttrDict(dict):
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__
 
-colors = AttributeDict()
+colors = AttrDict()
 colors.RGB_BLACK = 0
 colors.RGB_WHITE = 122
 colors.RGB_LIGHT_GRAY = 123
@@ -25,7 +23,7 @@ colors.BW_WHITE = 127
 
 # https://cycling74.com/forums/push-2-color-codes
 # https://www.colorhexa.com/
-colors.RGB_MAP = {
+RGB_MAP = {
     # 0 : (0,0,0), # RGB_BLACK
     # 3 : (100,65,0), # RGB_ORANGE
     # 8 : (100,100,0), # RGB_YELLOW
@@ -168,7 +166,7 @@ colors.RGB_MAP = {
     127 : (255,0,0,1)
 }
 
-animations = AttributeDict()
+animations = AttrDict()
 animations.STOP = 0
 animations.ONESHOT_24TH = 1
 animations.ONESHOT_16TH = 2
@@ -186,7 +184,7 @@ animations.BLINKING_8TH = 8
 animations.BLINKING_QUARTER = 9
 animations.BLINKING_HALF = 10
 
-controls = AttributeDict()
+controls = AttrDict()
 controls.BUTTON_TAP_TEMPO = 'Button.TapTempo.3.0'
 controls.BUTTON_METRONOME = 'Button.Metronome.9.0'
 controls.BUTTON_DELETE = 'Button.Delete.118.0'
@@ -328,6 +326,14 @@ controls.PAD_15 = 'Pad.15.96.1'
 controls.PAD_16 = 'Pad.16.97.1'
 controls.PAD_17 = 'Pad.17.98.1'
 controls.PAD_18 = 'Pad.18.99.1'
+
+PADS_H = 8
+PADS_W = 8
+PADS_N = 64
+
+PADS = [value for (key, value) in sorted(controls.items()) if key.startswith("PAD")]
+BUTTONS = [value for (key, value) in sorted(controls.items()) if key.startswith("BUTTON")]
+ENCODERS = [value for (key, value) in sorted(controls.items()) if key.startswith("ENCODER")]
 
 PADS_64 = ['Pad.81.36.1',
            'Pad.82.37.1',

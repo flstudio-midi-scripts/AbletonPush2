@@ -47,7 +47,7 @@ def getClosestColor(Int):
 
     # https://stackoverflow.com/questions/1847092/given-an-rgb-value-what-would-be-the-best-way-to-find-the-closest-match-in-the-d
     # https://matplotlib.org/api/colors_api.html
-    for color, RGBA in colors.RGB_MAP.items():
+    for color, RGBA in RGB_MAP.items():
         r2 = RGBA[0]
         g2 = RGBA[1]
         b2 = RGBA[2]
@@ -77,8 +77,11 @@ class AbletonPush():
         self.isButtonShiftPressed = False
 
     def OnInit(self):
-        for control in controls.values():
-            updateLED(control)
+        for key, control in controls.items():
+            if key.startswith("PAD"):
+                updateLED(control, 0)
+            else:
+                updateLED(control)
 
     def OnDeInit(self):
         for control in controls.values():
@@ -271,8 +274,8 @@ def OnInit():
 def OnDeInit():
     ap.OnDeInit()
 
-# def OnIdle():
-#     print("OnIdle")
+def OnIdle():
+    pass
 
 def OnMidiIn(event):
     ap.OnMidiIn(event)
@@ -280,8 +283,8 @@ def OnMidiIn(event):
 def OnMidiMsg(event):
     ap.OnMidiMsg(event)
 
-# def OnMidiOutMsg(event):
-#     print("OnMidiOutMsg")
+def OnMidiOutMsg(event):
+    print("OnMidiOutMsg")
 
 # def OnNoteOn(event):
 #     print("OnNoteOn")
@@ -311,17 +314,17 @@ def OnRefresh(flags):
     print("OnRefresh")
     ap.OnRefresh(flags)
 
-# def OnDoFullRefresh():
-#     print("OnDoFullRefresh")
+def OnDoFullRefresh():
+    print("OnDoFullRefresh")
 
 # def OnUpdateBeatIndicator(value):
 #     print("OnUpdateBeatIndicator")
 
-# def OnDisplayZone():
-#     print("OnDisplayZone")
+def OnDisplayZone():
+    print("OnDisplayZone")
 
-# def OnUpdateLiveMode(lastTrack):
-#     print("OnUpdateLiveMode")
+def OnUpdateLiveMode(lastTrack):
+    print("OnUpdateLiveMode")
 
 # def OnDirtyMixerTrack():
 #     print("OnDirtyMixerTrack")
