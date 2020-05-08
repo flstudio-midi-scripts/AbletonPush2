@@ -142,8 +142,12 @@ class AbletonPush():
 
     # play button
     def OnButtonPlayPressed(self, control, event):
+        # stop if Shift button is pressed else pause
         if transport.isPlaying():
-            transport.stop()
+            if self.isButtonShiftPressed:
+                transport.stop()
+            else:
+                transport.start()
         else:
             transport.start()
 
@@ -157,8 +161,7 @@ class AbletonPush():
 
     # metronome button
     def OnButtonMetronomePressed(self, control, event):
-        print("metro pressed")
-        transport.globalTransport(midi.FPT_Metronome, 110)
+        transport.globalTransport(midi.FPT_Metronome, event.pmeFlags)
         # transport.globalTransport(midi.FPT_Metronome, event.pmeFlags)
 
     def OnButtonMetronomeReleased(self, control, event):

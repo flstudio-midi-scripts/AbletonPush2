@@ -4,15 +4,15 @@ Given the limited set of features implemented so far, at this stage this script 
 
 ## Features
 
-- [X] Press Play button -> play/stop (blinking green/orange when playing in song/pattern mode)
-- [X] Press Record button -> toggle record
-- [X] Press Double Loop button -> song/pattern mode
-- [X] Press Quantize button -> snap on/off (press Shift + Quantize button -> select snap mode)
-- [X] Press Device/Mix/Browse/Clip button -> show/hide channel rack/mixer/browser/piano roll
-- [X] 8x8 pad grid shows up to 64 patterns and hitting the pad selects the corresponding pattern
-- [X] Rotate Tempo encoder -> change selected track (TODO: press Shift button to change tempo)
-- [X] Rotate Master encoder -> change master volume (press Shift button to change pan)
-- [X] Rotate encoder 1-8 -> change track 1-8 volume (press Shift button to change pan) where track 1 is the selected track
+- [X] Press Play button to play/pause (press Shift + Play button to pause). Button blinks in green/orange when playing in song/pattern mode respectively.
+- [X] Press Record button to toggle record
+- [X] Press Double Loop button to toggle song/pattern mode
+- [X] Press Quantize button to toggle snap on/off (press Shift + Quantize button to select snap mode)
+- [X] Press Device/Mix/Browse/Clip button to show/hide channel rack/mixer/browser/piano roll
+- [X] Press Pad to select corresponding pattern (grid shows up to 64 patterns using the 64-pad mode layout)
+- [X] Rotate Tempo encoder to change selected track (TODO: press Shift button to change tempo)
+- [X] Rotate Master encoder to change master volume (press Shift button to change pan)
+- [X] Rotate encoder 1-8 to change track 1-8 volume (press Shift button to change pan) where track 1 is the selected track
 - [ ] Pretty much everything remains to be implemented (particularly the implementation of performance pad mode as on the launchpads)!
 
 ## References
