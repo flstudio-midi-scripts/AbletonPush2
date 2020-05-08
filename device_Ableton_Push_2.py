@@ -140,31 +140,41 @@ class AbletonPush():
                 self.dispatch(f'OnTouchstripReleased', control, event)
         # print(event.status, event.data1, event.data2)
 
+    # play button
     def OnButtonPlayPressed(self, control, event):
         if transport.isPlaying():
             transport.stop()
         else:
             transport.start()
 
+    # record button
+    def OnButtonRecordPressed(self, control, event):
+        transport.record()
+
+    # double loop button
     def OnButtonDoubleLoopPressed(self, control, event):
         transport.setLoopMode()
 
-    # master encoder
-    def OnEncoderMasterIncreased(self, control, event):
-        if self.isButtonShiftPressed:
-            mixer.setTrackPan(0, mixer.getTrackPan(0) + PAN_INC)
-        else:
-            mixer.setTrackVolume(0, mixer.getTrackVolume(0) + VOL_INC)
+    # metronome button
+    def OnButtonMetronomePressed(self, control, event):
+        print("metro pressed")
+        transport.globalTransport(midi.FPT_Metronome, 110)
+        # transport.globalTransport(midi.FPT_Metronome, event.pmeFlags)
 
-    def OnEncoderMasterDecreased(self, control, event):
-        if self.isButtonShiftPressed:
-            mixer.setTrackPan(0, mixer.getTrackPan(0) - PAN_INC)
-        else:
-            mixer.setTrackVolume(0, mixer.getTrackVolume(0) - VOL_INC)
+    def OnButtonMetronomeReleased(self, control, event):
+        print("metro released")
+
+    # tap tempo button TODO + shift -> cycle through the preset tempos
+    def OnButtonTapTempoPressed(self, control, event):
+        updateLED(controls.BUTTON_TAP_TEMPO, colors.BW_WHITE)
+        transport.globalTransport(midi.FPT_TapTempo, event.pmeFlags)
+
+    def OnButtonTapTempoReleased(self, control, event):
+        updateLED(controls.BUTTON_TAP_TEMPO)
 
     # tempo encoder
     def OnEncoderTempoIncreased(self, control, event):
-        if self.isButtonShiftPressed:
+        if self.isButtonShiftPressed: # TODO change tempo when avail in API
             # transport.globalTransport(midi.FPT_NudgePlus, event.pmeFlags)
             pass
         else:
@@ -184,6 +194,19 @@ class AbletonPush():
             else:
                 if mixer.trackNumber() > 1:
                     mixer.setTrackNumber(mixer.trackNumber() - 1)
+
+    # master encoder
+    def OnEncoderMasterIncreased(self, control, event):
+        if self.isButtonShiftPressed:
+            mixer.setTrackPan(0, mixer.getTrackPan(0) + PAN_INC)
+        else:
+            mixer.setTrackVolume(0, mixer.getTrackVolume(0) + VOL_INC)
+
+    def OnEncoderMasterDecreased(self, control, event):
+        if self.isButtonShiftPressed:
+            mixer.setTrackPan(0, mixer.getTrackPan(0) - PAN_INC)
+        else:
+            mixer.setTrackVolume(0, mixer.getTrackVolume(0) - VOL_INC)
 
     # numbered encoder
     def OnEncoderIncreased(self, control, event):
@@ -213,12 +236,6 @@ class AbletonPush():
                 mixer.setTrackVolume(mixer.trackNumber() + control_number - 1, mixer.getTrackVolume(mixer.trackNumber() + control_number - 1) - VOL_INC)
             elif ui.getFocused(midi.widChannelRack) and channels.channelCount() >= control_number:
                 channels.setChannelVolume(channels.channelNumber() + control_number - 1, channels.getChannelVolume(channels.channelNumber() + control_number - 1) - VOL_INC)
-
-    def OnButtonRecordPressed(self, control, event):
-        transport.record()
-
-    def OnButtonMetronomePressed(self, control, event):
-        pass
 
     # quantize/snap button
     def OnButtonQuantizePressed(self, control, event):
