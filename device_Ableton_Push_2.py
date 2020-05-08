@@ -17,7 +17,10 @@ import utils
 
 from constants import *
 
-def getClosestColor(Int):
+def sendMIDI(command, channel, data1, data2):
+    device.midiOutMsg((command | channel) + (data1 << 8) + (data2 << 16))
+
+def getClosestColor(color):
     # TODO Create and send custom color palette to Push to match the colors in the FL project (https://github.com/Ableton/push-interface/issues/2)
 
     # http://www.shodor.org/stella2java/rgbint.html
@@ -36,24 +39,22 @@ def getClosestColor(Int):
     #     Int = (alpha<<24) + (red<<16) + (green<<8) + blue
     #     return Int
 
-    a1 = (Int >> 24) & 255
-    r1 = (Int >> 16) & 255
-    g1 = (Int >> 8) & 255
-    b1 = Int & 255
+    RGB = utils.ColorToRGB(color)
 
-    rgba = (r1, g1, b1, a1)
+    R1 = RGB[0]
+    G1 = RGB[1]
+    B1 = RGB[2]
 
     d = {}
 
     # https://stackoverflow.com/questions/1847092/given-an-rgb-value-what-would-be-the-best-way-to-find-the-closest-match-in-the-d
     # https://matplotlib.org/api/colors_api.html
-    for color, RGBA in RGB_MAP.items():
-        r2 = RGBA[0]
-        g2 = RGBA[1]
-        b2 = RGBA[2]
-        a2 = RGBA[3]
-        # d[color] = ((r2-r1)*0.30)**2 + ((g2-g1)*0.59)**2 + ((b2-b1)*0.11)**2
-        d[color] = (r2-r1)**2 + (g2-g1)**2 + (b2-b1)**2
+    for color, RGB in RGB_MAP.items():
+        R2 = RGB[0]
+        G2 = RGB[1]
+        B2 = RGB[2]
+        d[color] = (R2-R1)**2 + (G2-G1)**2 + (B2-B1)**2
+
     return min(d, key=d.get)
 
 def updateLED(control, color = None, animation = 0):
