@@ -4,7 +4,7 @@ Given the limited set of features implemented so far, at this stage this script 
 
 ## Features
 
-- [X] Press Play button to play/pause (press Shift + Play button to pause). Button blinks in green/orange when playing in song/pattern mode respectively.
+- [X] Press Play button to play/pause (press Shift + Play button to pause, button blinks in green/orange when playing in song/pattern mode respectively)
 - [X] Press Record button to toggle record
 - [X] Press Double Loop button to toggle song/pattern mode
 - [X] Press Quantize button to toggle snap on/off (press Shift + Quantize button to select snap mode)
