@@ -1,5 +1,7 @@
 # FL Studio MIDI script for Ableton Push 2
 
+Given the limited set of features implemented so far, at this stage this script should be considered for educational purposes only :)
+
 ## Features
 
 - [X] Press Play button -> play/stop (blinking green/orange when playing in song/pattern mode)
@@ -11,7 +13,7 @@
 - [X] Rotate Tempo encoder -> change selected track (TODO: press Shift button to change tempo)
 - [X] Rotate Master encoder -> change master volume (press Shift button to change pan)
 - [X] Rotate encoder 1-8 -> change track 1-8 volume (press Shift button to change pan) where track 1 is the selected track
-- [ ] Pretty much everything remains to be implemented (particularly the implementation of performance pad mode as on the launchpads)! At this stage this is to be considered for educational purposes only :)
+- [ ] Pretty much everything remains to be implemented (particularly the implementation of performance pad mode as on the launchpads)!
 
 ## References
 
