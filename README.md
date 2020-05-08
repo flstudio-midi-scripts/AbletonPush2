@@ -9,8 +9,8 @@
 - [X] Press Device/Mix/Browse/Clip button -> show/hide channel rack/mixer/browser/piano roll
 - [X] 8x8 pad grid shows up to 64 patterns and hitting the pad selects the corresponding pattern
 - [X] Rotate Tempo encoder -> change selected track (TODO: press Shift button to change tempo)
-- [X] Rotate Master encoder -> change master volume (press Shift button to change master pan)
-- [X] Rotate encoder 1-8 -> change track 1-8 volume (press Shift button to change master pan) where track 1 is the selected track
+- [X] Rotate Master encoder -> change master volume (press Shift button to change pan)
+- [X] Rotate encoder 1-8 -> change track 1-8 volume (press Shift button to change pan) where track 1 is the selected track
 - [ ] Pretty much everything remains to be implemented (particularly the implementation of performance pad mode as on the launchpads)! At this stage this is to be considered for educational purposes only :)
 
 ## References
