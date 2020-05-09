@@ -8,7 +8,7 @@ Given the limited set of features implemented so far, at this stage this script 
 - [X] Press Record button to toggle record
 - [X] Press Double Loop button to toggle song/pattern mode
 - [X] Press Quantize button to toggle snap on/off (press Shift + Quantize button to select snap mode)
-- [X] Press Device/Mix/Browse/Clip button to show/hide channel rack/mixer/browser/piano roll
+- [X] Press Device/Mix/Browse/Clip/Note button to show/hide/focus channel rack/mixer/browser/playlist/piano roll
 - [X] Press Pad to select corresponding pattern (grid shows up to 64 patterns using the 64-pad mode layout, LED matches the best it can the pattern color)
 - [X] Rotate Tempo encoder to change selected track (press Shift + Tempo button to change tempo by 1 BPM)
 - [X] Rotate Master encoder to change master volume (press Shift button to change pan)

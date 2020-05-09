@@ -312,6 +312,10 @@ class AbletonPush():
         print("browser visible", ui.getVisible(midi.widBrowser))
         print("browser focused", ui.getFocused(midi.widBrowser))
 
+    # show/hide/focus piano roll
+    def OnButtonNotePressed(self, control, event):
+        transport.globalTransport(midi.FPT_F7, event.pmeFlags)
+
     # select pattern corresponding to pad when pressed
     def OnPadPressed(self, control, event):
         idx = PADS_64.index(control) + 1
@@ -393,6 +397,12 @@ class AbletonPush():
                 self.updateLED(controls.BUTTON_BROWSE, colors.BW_WHITE)
             else:
                 self.updateLED(controls.BUTTON_BROWSE)
+
+            # note [piano roll] button
+            if ui.getFocused(midi.widPianoRoll):
+                self.updateLED(controls.BUTTON_NOTE, colors.BW_WHITE)
+            else:
+                self.updateLED(controls.BUTTON_NOTE)
 
             # quantize/snap button
             if ui.getSnapMode() != 3:
