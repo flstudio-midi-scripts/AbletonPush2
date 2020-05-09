@@ -62,6 +62,8 @@ class AbletonPush():
         self.mixer.encodersTarget = ENCODERS_TARGET.TRACK_VOL
         self.channels = AttrDict()
         self.channels.encodersTarget = ENCODERS_TARGET.CHANNEL_VOL
+        self.playlist = AttrDict()
+        self.playlist.encodersTarget = ENCODERS_TARGET.CLIP_VOL
 
     def OnInit(self):
         for control in controls.values():
@@ -208,6 +210,10 @@ class AbletonPush():
                 channels.setChannelVolume(index, channels.getChannelVolume(index) + VOL_INC)
             elif self.channels.encodersTarget == ENCODERS_TARGET.CHANNEL_PAN:
                 channels.setChannelPan(index, channels.getChannelPan(index) + PAN_INC)
+        elif ui.getFocused(midi.widPlaylist):
+            index = playlist.trackNumber() + control_number - 1
+            if self.playlist.encodersTarget == ENCODERS_TARGET.CLIP_VOL:
+                pass
 
     def OnEncoderDecreased(self, control, event):
         control_type, control_name, control_id, control_note_or_color = control.split(".")
@@ -224,6 +230,10 @@ class AbletonPush():
                 channels.setChannelVolume(index, channels.getChannelVolume(index) - VOL_INC)
             elif self.channels.encodersTarget == ENCODERS_TARGET.CHANNEL_PAN:
                 channels.setChannelPan(index, channels.getChannelPan(index) - PAN_INC)
+        elif ui.getFocused(midi.widPlaylist):
+            index = playlist.trackNumber() + control_number - 1
+            if self.playlist.encodersTarget == ENCODERS_TARGET.CLIP_VOL:
+                pass
 
     def OnEncoderTouched(self, control, event):
         control_type, control_name, control_id, control_note_or_color = control.split(".")
@@ -241,6 +251,10 @@ class AbletonPush():
                     channels.setChannelVolume(index, 1)
                 elif self.channels.encodersTarget == ENCODERS_TARGET.CHANNEL_PAN:
                     channels.setChannelPan(index, 0)
+            elif ui.getFocused(midi.widPlaylist):
+                index = playlist.trackNumber() + control_number - 1
+                if self.playlist.encodersTarget == ENCODERS_TARGET.CLIP_VOL:
+                    pass
 
     # numbered upper button
     def OnButtonUpperPressed(self, control, event):
@@ -250,6 +264,8 @@ class AbletonPush():
             self.mixer.encodersTarget = control_number
         elif ui.getFocused(midi.widChannelRack) and control_number <= 2:
             self.channels.encodersTarget = control_number
+        elif ui.getFocused(midi.widPlaylist) and control_number <= 1:
+            self.playlist.encodersTarget = control_number
         self.updateLEDs()
 
     # quantize/snap button
@@ -279,19 +295,19 @@ class AbletonPush():
         updateLED(controls.BUTTON_SHIFT)
         self.controls.isButtonShiftPressed = False
 
-    # show/hide channel rack
+    # show/hide/focus channel rack
     def OnButtonDevicePressed(self, control, event):
         transport.globalTransport(midi.FPT_F6, event.pmeFlags)
 
-    # show/hide mixer
+    # show/hide/focus mixer
     def OnButtonMixPressed(self, control, event):
         transport.globalTransport(midi.FPT_F9, event.pmeFlags)
 
-    # show/hide piano roll
+    # show/hide/focus playlist
     def OnButtonClipPressed(self, control, event):
-        transport.globalTransport(midi.FPT_F7, event.pmeFlags)
+        transport.globalTransport(midi.FPT_F5, event.pmeFlags)
 
-    # show/hide browser
+    # show/hide/focus browser
     def OnButtonBrowsePressed(self, control, event):
         print("browser visible", ui.getVisible(midi.widBrowser))
         print("browser focused", ui.getFocused(midi.widBrowser))
@@ -366,8 +382,8 @@ class AbletonPush():
             else:
                 self.updateLED(controls.BUTTON_MIX)
 
-            # clip [piano roll] button
-            if ui.getFocused(midi.widPianoRoll):
+            # clip [playlist] button
+            if ui.getFocused(midi.widPlaylist):
                 self.updateLED(controls.BUTTON_CLIP, colors.BW_WHITE)
             else:
                 self.updateLED(controls.BUTTON_CLIP)
@@ -395,6 +411,11 @@ class AbletonPush():
                 elif ui.getFocused(midi.widChannelRack):
                     if (idx == self.channels.encodersTarget):
                         self.updateLED(button, colors.RGB_ORANGE)
+                    else:
+                        self.updateLED(button)
+                elif ui.getFocused(midi.widPlaylist):
+                    if (idx == self.playlist.encodersTarget):
+                        self.updateLED(button, colors.RGB_GREEN)
                     else:
                         self.updateLED(button)
                 else:
