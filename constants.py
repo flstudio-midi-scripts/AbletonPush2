@@ -5,6 +5,19 @@ class AttrDict(dict):
 VOL_INC = 0.0066
 PAN_INC = 0.0066
 
+ENCODERS_TARGET = AttrDict()
+ENCODERS_TARGET.CHANNEL_VOL = 1
+ENCODERS_TARGET.CHANNEL_PAN = 2
+ENCODERS_TARGET.CHANNEL_TRACK = 3
+ENCODERS_TARGET.TRACK_VOL = 1
+ENCODERS_TARGET.TRACK_PAN = 2
+ENCODERS_TARGET.TRACK_SEND_1 = 3
+ENCODERS_TARGET.TRACK_SEND_2 = 4
+ENCODERS_TARGET.TRACK_SEND_3 = 5
+ENCODERS_TARGET.TRACK_SEND_4 = 6
+ENCODERS_TARGET.TRACK_SEND_5 = 7
+ENCODERS_TARGET.TRACK_SEND_6 = 8
+
 colors = AttrDict()
 colors.RGB_BLACK = 0
 colors.RGB_WHITE = 122
@@ -220,14 +233,14 @@ controls.BUTTON_LOWER_5 = 'Button.Lower5.24.1'
 controls.BUTTON_LOWER_6 = 'Button.Lower6.25.1'
 controls.BUTTON_LOWER_7 = 'Button.Lower7.26.1'
 controls.BUTTON_LOWER_8 = 'Button.Lower8.27.1'
-controls.BUTTON_32T = 'Button.32T.43.1'
-controls.BUTTON_32 = 'Button.32.42.1'
-controls.BUTTON_16T = 'Button.16T.41.1'
-controls.BUTTON_16 = 'Button.16.40.1'
-controls.BUTTON_8T = 'Button.8T.39.1'
-controls.BUTTON_8 = 'Button.8.38.1'
-controls.BUTTON_4T = 'Button.4T.37.1'
-controls.BUTTON_4 = 'Button.4.36.1'
+controls.BUTTON_SCENE_1 = 'Button.Scene1.43.1'
+controls.BUTTON_SCENE_2 = 'Button.Scene2.42.1'
+controls.BUTTON_SCENE_3 = 'Button.Scene3.41.1'
+controls.BUTTON_SCENE_4 = 'Button.Scene4.40.1'
+controls.BUTTON_SCENE_5 = 'Button.Scene5.39.1'
+controls.BUTTON_SCENE_6 = 'Button.Scene6.38.1'
+controls.BUTTON_SCENE_7 = 'Button.Scene7.37.1'
+controls.BUTTON_SCENE_8 = 'Button.Scene8.36.1'
 controls.BUTTON_SETUP = 'Button.Setup.30.0'
 controls.BUTTON_USER = 'Button.User.59.0'
 controls.BUTTON_ADD_DEVICE = 'Button.AddDevice.52.0'
@@ -336,6 +349,8 @@ PADS_N = 64
 
 PADS = [value for (key, value) in sorted(controls.items()) if key.startswith("PAD")]
 BUTTONS = [value for (key, value) in sorted(controls.items()) if key.startswith("BUTTON")]
+BUTTONS_UPPER = [value for (key, value) in sorted(controls.items()) if key.startswith("BUTTON_UPPER")]
+BUTTONS_LOWER = [value for (key, value) in sorted(controls.items()) if key.startswith("BUTTON_LOWER")]
 ENCODERS = [value for (key, value) in sorted(controls.items()) if key.startswith("ENCODER")]
 
 PADS_64 = ['Pad.81.36.1',

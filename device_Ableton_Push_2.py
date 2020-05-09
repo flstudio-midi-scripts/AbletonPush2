@@ -75,7 +75,12 @@ def updateLED(control, color = None, animation = 0):
 
 class AbletonPush():
     def __init__(self):
-        self.isButtonShiftPressed = False
+        self.controls = AttrDict()
+        self.controls.isButtonShiftPressed = False
+        self.mixer = AttrDict()
+        self.mixer.encodersTarget = ENCODERS_TARGET.TRACK_VOL
+        self.channels = AttrDict()
+        self.channels.encodersTarget = ENCODERS_TARGET.CHANNEL_VOL
 
     def OnInit(self):
         for control in controls.values():
@@ -103,9 +108,15 @@ class AbletonPush():
             control_id = int(control_id)
             control_note_or_color = int(control_note_or_color)
             if control_type == "Button" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id and event.data2 == 127:
-                self.dispatch(f'On{control_type}{control_name}Pressed', control, event)
+                if control_name in ["Upper" + str(i) for i in range(1,9)]:
+                    self.dispatch(f'On{control_type}UpperPressed', control, event)
+                else:
+                    self.dispatch(f'On{control_type}{control_name}Pressed', control, event)
             elif control_type == "Button" and event.status == midi.MIDI_CONTROLCHANGE and event.data1 == control_id and event.data2 == 0:
-                self.dispatch(f'On{control_type}{control_name}Released', control, event)
+                if control_name in ["Upper" + str(i) for i in range(1,9)]:
+                    self.dispatch(f'On{control_type}UpperReleased', control, event)
+                else:
+                    self.dispatch(f'On{control_type}{control_name}Released', control, event)
             elif control_type == "Pad" and event.status == 144 and event.data1 == control_id:
                 self.dispatch(f'On{control_type}Pressed', control, event)
             elif control_type == "Pad" and event.status == 128 and event.data1 == control_id:
@@ -143,11 +154,8 @@ class AbletonPush():
     # play button
     def OnButtonPlayPressed(self, control, event):
         # stop if Shift button is pressed else pause
-        if transport.isPlaying():
-            if self.isButtonShiftPressed:
+        if self.controls.isButtonShiftPressed:
                 transport.stop()
-            else:
-                transport.start()
         else:
             transport.start()
 
@@ -162,10 +170,6 @@ class AbletonPush():
     # metronome button
     def OnButtonMetronomePressed(self, control, event):
         transport.globalTransport(midi.FPT_Metronome, event.pmeFlags)
-        # transport.globalTransport(midi.FPT_Metronome, event.pmeFlags)
-
-    def OnButtonMetronomeReleased(self, control, event):
-        print("metro released")
 
     # tap tempo button TODO + shift -> cycle through the preset tempos
     def OnButtonTapTempoPressed(self, control, event):
@@ -177,70 +181,99 @@ class AbletonPush():
 
     # tempo encoder
     def OnEncoderTempoIncreased(self, control, event):
-        if self.isButtonShiftPressed:
+        if self.controls.isButtonShiftPressed:
             transport.globalTransport(midi.FPT_TempoJog, 10)
         else:
             if ui.getFocused(midi.widChannelRack):
-                pass
+                pass # TODO move channel rack grid down
             else:
                 if mixer.trackNumber() < mixer.trackCount():
                     mixer.setTrackNumber(mixer.trackNumber() + 1)
 
     def OnEncoderTempoDecreased(self, control, event):
-        if self.isButtonShiftPressed:
+        if self.controls.isButtonShiftPressed:
             transport.globalTransport(midi.FPT_TempoJog, -10)
         else:
             if ui.getFocused(midi.widChannelRack):
-                pass
+                pass # TODO move channel rack grid up
             else:
-                if mixer.trackNumber() > 1:
+                if mixer.trackNumber() > 0:
                     mixer.setTrackNumber(mixer.trackNumber() - 1)
 
     # master encoder
     def OnEncoderMasterIncreased(self, control, event):
-        if self.isButtonShiftPressed:
-            mixer.setTrackPan(0, mixer.getTrackPan(0) + PAN_INC)
-        else:
-            mixer.setTrackVolume(0, mixer.getTrackVolume(0) + VOL_INC)
+        mixer.setTrackVolume(0, mixer.getTrackVolume(0) + VOL_INC)
 
     def OnEncoderMasterDecreased(self, control, event):
-        if self.isButtonShiftPressed:
-            mixer.setTrackPan(0, mixer.getTrackPan(0) - PAN_INC)
-        else:
-            mixer.setTrackVolume(0, mixer.getTrackVolume(0) - VOL_INC)
+        mixer.setTrackVolume(0, mixer.getTrackVolume(0) - VOL_INC)
+
+    def OnEncoderMasterTouched(self, control, event):
+        if self.controls.isButtonShiftPressed:
+            mixer.setTrackVolume(0, 1)
 
     # numbered encoder
     def OnEncoderIncreased(self, control, event):
         control_type, control_name, control_id, control_note_or_color = control.split(".")
         control_number = int(control_name)
-        if self.isButtonShiftPressed:
-            if ui.getFocused(midi.widMixer):
-                mixer.setTrackPan(mixer.trackNumber() + control_number - 1, mixer.getTrackPan(mixer.trackNumber() + control_number - 1) + PAN_INC)
-            elif ui.getFocused(midi.widChannelRack) and channels.channelCount() >= control_number:
-                channels.setChannelPan(channels.channelNumber() + control_number - 1, channels.getChannelPan(channels.channelNumber() + control_number - 1) + PAN_INC)
-        else:
-            if ui.getFocused(midi.widMixer):
-                mixer.setTrackVolume(mixer.trackNumber() + control_number - 1, mixer.getTrackVolume(mixer.trackNumber() + control_number - 1) + VOL_INC)
-            elif ui.getFocused(midi.widChannelRack) and channels.channelCount() >= control_number:
-                channels.setChannelVolume(channels.channelNumber() + control_number - 1, channels.getChannelVolume(channels.channelNumber() + control_number - 1) + VOL_INC)
+        if ui.getFocused(midi.widMixer):
+            index = mixer.trackNumber() + control_number - 1
+            if self.mixer.encodersTarget == ENCODERS_TARGET.TRACK_VOL:
+                mixer.setTrackVolume(index, mixer.getTrackVolume(index) + VOL_INC)
+            elif self.mixer.encodersTarget == ENCODERS_TARGET.TRACK_PAN:
+                mixer.setTrackPan(index, mixer.getTrackPan(index) + PAN_INC)
+        elif ui.getFocused(midi.widChannelRack) and control_number <= channels.channelCount():
+            index = channels.channelNumber() + control_number - 1
+            if self.channels.encodersTarget == ENCODERS_TARGET.CHANNEL_VOL:
+                channels.setChannelVolume(index, channels.getChannelVolume(index) + VOL_INC)
+            elif self.channels.encodersTarget == ENCODERS_TARGET.CHANNEL_PAN:
+                channels.setChannelPan(index, channels.getChannelPan(index) + PAN_INC)
 
     def OnEncoderDecreased(self, control, event):
         control_type, control_name, control_id, control_note_or_color = control.split(".")
         control_number = int(control_name)
-        if self.isButtonShiftPressed:
+        if ui.getFocused(midi.widMixer):
+            index = mixer.trackNumber() + control_number - 1
+            if self.mixer.encodersTarget == ENCODERS_TARGET.TRACK_VOL:
+                mixer.setTrackVolume(index, mixer.getTrackVolume(index) - VOL_INC)
+            elif self.mixer.encodersTarget == ENCODERS_TARGET.TRACK_PAN:
+                mixer.setTrackPan(index, mixer.getTrackPan(index) - PAN_INC)
+        elif ui.getFocused(midi.widChannelRack) and control_number <= channels.channelCount():
+            index = channels.channelNumber() + control_number - 1
+            if self.channels.encodersTarget == ENCODERS_TARGET.CHANNEL_VOL:
+                channels.setChannelVolume(index, channels.getChannelVolume(index) - VOL_INC)
+            elif self.channels.encodersTarget == ENCODERS_TARGET.CHANNEL_PAN:
+                channels.setChannelPan(index, channels.getChannelPan(index) - PAN_INC)
+
+    def OnEncoderTouched(self, control, event):
+        control_type, control_name, control_id, control_note_or_color = control.split(".")
+        control_number = int(control_name)
+        if self.controls.isButtonShiftPressed:
             if ui.getFocused(midi.widMixer):
-                mixer.setTrackPan(mixer.trackNumber() + control_number - 1, mixer.getTrackPan(mixer.trackNumber() + control_number - 1) - PAN_INC)
-            elif ui.getFocused(midi.widChannelRack) and channels.channelCount() >= control_number:
-                channels.setChannelPan(channels.channelNumber() + control_number - 1, channels.getChannelPan(channels.channelNumber() + control_number - 1) - PAN_INC)
-        else:
-            if ui.getFocused(midi.widMixer):
-                mixer.setTrackVolume(mixer.trackNumber() + control_number - 1, mixer.getTrackVolume(mixer.trackNumber() + control_number - 1) - VOL_INC)
-            elif ui.getFocused(midi.widChannelRack) and channels.channelCount() >= control_number:
-                channels.setChannelVolume(channels.channelNumber() + control_number - 1, channels.getChannelVolume(channels.channelNumber() + control_number - 1) - VOL_INC)
+                index = mixer.trackNumber() + control_number - 1
+                if self.mixer.encodersTarget == ENCODERS_TARGET.TRACK_VOL:
+                    mixer.setTrackVolume(index, 1)
+                elif self.mixer.encodersTarget == ENCODERS_TARGET.TRACK_PAN:
+                    mixer.setTrackPan(index, 0)
+            elif ui.getFocused(midi.widChannelRack) and control_number <= channels.channelCount():
+                index = channels.channelNumber() + control_number - 1
+                if self.channels.encodersTarget == ENCODERS_TARGET.CHANNEL_VOL:
+                    channels.setChannelVolume(index, 1)
+                elif self.channels.encodersTarget == ENCODERS_TARGET.CHANNEL_PAN:
+                    channels.setChannelPan(index, 0)
+
+    # numbered upper button
+    def OnButtonUpperPressed(self, control, event):
+        control_type, control_name, control_id, control_note_or_color = control.split(".")
+        control_number = int(control_name.replace("Upper", ""))
+        if ui.getFocused(midi.widMixer) and control_number <= 2:
+            self.mixer.encodersTarget = control_number
+        elif ui.getFocused(midi.widChannelRack) and control_number <= 2:
+            self.channels.encodersTarget = control_number
+        self.updateLEDs()
 
     # quantize/snap button
     def OnButtonQuantizePressed(self, control, event):
-        if self.isButtonShiftPressed:
+        if self.controls.isButtonShiftPressed:
             ui.snapMode(1)
         else:
             ui.snapOnOff()
@@ -248,7 +281,7 @@ class AbletonPush():
     # undo button
     def OnButtonUndoPressed(self, control, event):
         updateLED(controls.BUTTON_UNDO, colors.BW_WHITE)
-        if self.isButtonShiftPressed:
+        if self.controls.isButtonShiftPressed:
             general.undoDown()
         else:
             general.undoUp()
@@ -259,11 +292,11 @@ class AbletonPush():
     # shift button
     def OnButtonShiftPressed(self, control, event):
         updateLED(controls.BUTTON_SHIFT, colors.BW_WHITE)
-        self.isButtonShiftPressed = True
+        self.controls.isButtonShiftPressed = True
 
     def OnButtonShiftReleased(self, control, event):
         updateLED(controls.BUTTON_SHIFT)
-        self.isButtonShiftPressed = False
+        self.controls.isButtonShiftPressed = False
 
     # show/hide channel rack
     def OnButtonDevicePressed(self, control, event):
@@ -352,6 +385,22 @@ class AbletonPush():
                 updateLED(controls.BUTTON_QUANTIZE, colors.BW_WHITE)
             else:
                 updateLED(controls.BUTTON_QUANTIZE)
+
+
+            # numbered upper buttons
+            for idx, button in enumerate(BUTTONS_UPPER, 1):
+                if ui.getFocused(midi.widMixer):
+                    if (idx == self.mixer.encodersTarget):
+                        updateLED(button, colors.RGB_WHITE)
+                    else:
+                        updateLED(button)
+                elif ui.getFocused(midi.widChannelRack):
+                    if (idx == self.channels.encodersTarget):
+                        updateLED(button, colors.RGB_WHITE)
+                    else:
+                        updateLED(button)
+                else:
+                    updateLED(button)
 
             # pads
             for idx, pad in enumerate(PADS_64, 1):

@@ -12,7 +12,7 @@ Given the limited set of features implemented so far, at this stage this script 
 - [X] Press Pad to select corresponding pattern (grid shows up to 64 patterns using the 64-pad mode layout, LED matches the best it can the pattern color)
 - [X] Rotate Tempo encoder to change selected track (press Shift + Tempo button to change tempo by 1 BPM)
 - [X] Rotate Master encoder to change master volume (press Shift button to change pan)
-- [X] Rotate encoder 1-8 to change track 1-8 volume (press Shift button to change pan) where track 1 is the selected track
+- [X] Rotate encoder 1-8 to change track or channel 1-8 volume (upper button 1) or pan (upper button 2) where track/channel 1 is the selected track/channel and depending on whether mixer or channel rack is focused (press Shift button and touch encoder to reset volume or pan)
 - [ ] Pretty much everything remains to be implemented (particularly the implementation of performance pad mode as on the launchpads)!
 
 ## References
