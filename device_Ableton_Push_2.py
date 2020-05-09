@@ -17,9 +17,6 @@ import utils
 
 from constants import *
 
-def sendMIDI(command, channel, data1, data2):
-    device.midiOutMsg((command | channel) + (data1 << 8) + (data2 << 16))
-
 def getClosestColor(color):
     # TODO Create and send custom color palette to Push to match the colors in the FL project (https://github.com/Ableton/push-interface/issues/2)
 
@@ -57,22 +54,6 @@ def getClosestColor(color):
 
     return min(d, key=d.get)
 
-def updateLED(control, color = None, animation = 0):
-    if device.isAssigned():
-        control_type, control_name, control_id, control_note_or_color = control.split(".")
-        control_id = int(control_id)
-        control_note_or_color = int(control_note_or_color)
-        isRGB = bool(control_note_or_color)
-        if color is None:
-            if isRGB:
-                color = colors.RGB_DARK_GRAY
-            else:
-                color = colors.BW_DARK_GRAY
-        status = midi.MIDI_CONTROLCHANGE + animation if control_type == "Button" else midi.MIDI_NOTEON + animation
-        data1 = eval(f"{hex(control_id)} << 8")
-        data2 = eval(f"{hex(color)} << 16")
-        device.midiOutMsg(status + data1 + data2)
-
 class AbletonPush():
     def __init__(self):
         self.controls = AttrDict()
@@ -84,11 +65,11 @@ class AbletonPush():
 
     def OnInit(self):
         for control in controls.values():
-            updateLED(control)
+            self.updateLED(control)
 
     def OnDeInit(self):
         for control in controls.values():
-            updateLED(control, 0)
+            self.updateLED(control, 0)
 
     def OnMidiIn(self, event):
         if event.status == midi.MIDI_ACTIVESENSING: event.handled = True
@@ -327,95 +308,112 @@ class AbletonPush():
         else:
             print(f'Call to {func} not yet implemented!')
 
+    # update LED
+    def updateLED(self, control, color = None, animation = 0):
+        if device.isAssigned():
+            control_type, control_name, control_id, control_note_or_color = control.split(".")
+            control_id = int(control_id)
+            control_note_or_color = int(control_note_or_color)
+            isRGB = bool(control_note_or_color)
+            if color is None:
+                if isRGB:
+                    color = colors.RGB_DARK_GRAY
+                else:
+                    color = colors.BW_DARK_GRAY
+            status = midi.MIDI_CONTROLCHANGE + animation if control_type == "Button" else midi.MIDI_NOTEON + animation
+            data1 = eval(f"{hex(control_id)} << 8")
+            data2 = eval(f"{hex(color)} << 16")
+            device.midiOutMsg(status + data1 + data2)
+
     # update LEDs
     def updateLEDs(self):
         if device.isAssigned():
             # play button
             if transport.isPlaying() and transport.getLoopMode():
-                updateLED(controls.BUTTON_PLAY, colors.RGB_GREEN, animations.BLINKING_QUARTER)
+                self.updateLED(controls.BUTTON_PLAY, colors.RGB_GREEN, animations.BLINKING_QUARTER)
             elif transport.isPlaying():
-                updateLED(controls.BUTTON_PLAY, colors.RGB_ORANGE, animations.BLINKING_QUARTER)
+                self.updateLED(controls.BUTTON_PLAY, colors.RGB_ORANGE, animations.BLINKING_QUARTER)
             else:
-                updateLED(controls.BUTTON_PLAY)
+                self.updateLED(controls.BUTTON_PLAY)
 
             # record button
             if transport.isRecording():
-                updateLED(controls.BUTTON_RECORD, colors.RGB_RED)
+                self.updateLED(controls.BUTTON_RECORD, colors.RGB_RED)
             else:
-                updateLED(controls.BUTTON_RECORD)
+                self.updateLED(controls.BUTTON_RECORD)
 
             # double loop [song/pattern] button
             if transport.getLoopMode():
-                updateLED(controls.BUTTON_DOUBLE_LOOP)
+                self.updateLED(controls.BUTTON_DOUBLE_LOOP)
             else:
-                updateLED(controls.BUTTON_DOUBLE_LOOP, colors.BW_WHITE)
+                self.updateLED(controls.BUTTON_DOUBLE_LOOP, colors.BW_WHITE)
 
             # metronome button
             if ui.isMetronomeEnabled():
-                updateLED(controls.BUTTON_METRONOME, colors.BW_WHITE)
+                self.updateLED(controls.BUTTON_METRONOME, colors.BW_WHITE)
             else:
-                updateLED(controls.BUTTON_METRONOME)
+                self.updateLED(controls.BUTTON_METRONOME)
 
             # device [channel rack] button
             if ui.getFocused(midi.widChannelRack):
-                updateLED(controls.BUTTON_DEVICE, colors.BW_WHITE)
+                self.updateLED(controls.BUTTON_DEVICE, colors.BW_WHITE)
             else:
-                updateLED(controls.BUTTON_DEVICE)
+                self.updateLED(controls.BUTTON_DEVICE)
 
             # mix [mixer] button
             if ui.getFocused(midi.widMixer):
-                updateLED(controls.BUTTON_MIX, colors.BW_WHITE)
+                self.updateLED(controls.BUTTON_MIX, colors.BW_WHITE)
             else:
-                updateLED(controls.BUTTON_MIX)
+                self.updateLED(controls.BUTTON_MIX)
 
             # clip [piano roll] button
             if ui.getFocused(midi.widPianoRoll):
-                updateLED(controls.BUTTON_CLIP, colors.BW_WHITE)
+                self.updateLED(controls.BUTTON_CLIP, colors.BW_WHITE)
             else:
-                updateLED(controls.BUTTON_CLIP)
+                self.updateLED(controls.BUTTON_CLIP)
 
             # browse [browser] button
             if ui.getFocused(midi.widBrowser):
-                updateLED(controls.BUTTON_BROWSE, colors.BW_WHITE)
+                self.updateLED(controls.BUTTON_BROWSE, colors.BW_WHITE)
             else:
-                updateLED(controls.BUTTON_BROWSE)
+                self.updateLED(controls.BUTTON_BROWSE)
 
             # quantize/snap button
             if ui.getSnapMode() != 3:
-                updateLED(controls.BUTTON_QUANTIZE, colors.BW_WHITE)
+                self.updateLED(controls.BUTTON_QUANTIZE, colors.BW_WHITE)
             else:
-                updateLED(controls.BUTTON_QUANTIZE)
+                self.updateLED(controls.BUTTON_QUANTIZE)
 
 
             # numbered upper buttons
             for idx, button in enumerate(BUTTONS_UPPER, 1):
                 if ui.getFocused(midi.widMixer):
                     if (idx == self.mixer.encodersTarget):
-                        updateLED(button, colors.RGB_WHITE)
+                        self.updateLED(button, colors.RGB_WHITE)
                     else:
-                        updateLED(button)
+                        self.updateLED(button)
                 elif ui.getFocused(midi.widChannelRack):
                     if (idx == self.channels.encodersTarget):
-                        updateLED(button, colors.RGB_WHITE)
+                        self.updateLED(button, colors.RGB_ORANGE)
                     else:
-                        updateLED(button)
+                        self.updateLED(button)
                 else:
-                    updateLED(button)
+                    self.updateLED(button)
 
             # pads
             for idx, pad in enumerate(PADS_64, 1):
                 if idx <= patterns.patternCount():
                     if (idx == patterns.patternNumber()):
                         if transport.isPlaying():
-                            updateLED(pad, 0)
-                            updateLED(pad, getClosestColor(patterns.getPatternColor(idx)), animations.BLINKING_QUARTER)
+                            self.updateLED(pad, 0)
+                            self.updateLED(pad, getClosestColor(patterns.getPatternColor(idx)), animations.BLINKING_QUARTER)
                         else:
-                            updateLED(pad, 0)
-                            updateLED(pad, getClosestColor(patterns.getPatternColor(idx)), animations.PULSING_HALF)
+                            self.updateLED(pad, 0)
+                            self.updateLED(pad, getClosestColor(patterns.getPatternColor(idx)), animations.PULSING_HALF)
                     else:
-                        updateLED(pad, getClosestColor(patterns.getPatternColor(idx)))
+                        self.updateLED(pad, getClosestColor(patterns.getPatternColor(idx)))
                 else:
-                    updateLED(pad, 0)
+                    self.updateLED(pad, 0)
 
 ap = AbletonPush()
 
