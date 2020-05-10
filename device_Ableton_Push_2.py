@@ -80,7 +80,7 @@ class AbletonPush():
             event.handled = True
 
     def OnRefresh(self, flags):
-        if flags and midi.HW_Dirty_LEDs:
+        if flags and (midi.HW_Dirty_LEDs | midi.HW_Dirty_FocusedWindow):
             self.updateLEDs()
 
     def OnDirtyMixerTrack(self, lastTrack):
@@ -158,11 +158,11 @@ class AbletonPush():
 
     # tap tempo button TODO + shift -> cycle through the preset tempos
     def OnButtonTapTempoPressed(self, control, event):
-        self.updateLED(CONTROLS.BUTTONS.TAP_TEMPO, COLORS.BW.WHITE)
+        self.updateLED(control, COLORS.BW.WHITE)
         transport.globalTransport(midi.FPT_TapTempo, event.pmeFlags)
 
     def OnButtonTapTempoReleased(self, control, event):
-        self.updateLED(CONTROLS.BUTTONS.TAP_TEMPO)
+        self.updateLED(control)
 
     # tempo encoder
     def OnEncoderTempoIncreased(self, control, event):
@@ -279,49 +279,94 @@ class AbletonPush():
 
     # undo button
     def OnButtonUndoPressed(self, control, event):
-        self.updateLED(CONTROLS.BUTTONS.UNDO, COLORS.BW.WHITE)
+        self.updateLED(control, COLORS.BW.WHITE)
         if self.controls.isButtonShiftPressed:
             general.undoDown()
         else:
             general.undoUp()
 
     def OnButtonUndoReleased(self, control, event):
-        self.updateLED(CONTROLS.BUTTONS.UNDO)
+        self.updateLED(control)
 
     # shift button
     def OnButtonShiftPressed(self, control, event):
         self.controls.isButtonShiftPressed = True
-        self.updateLED(CONTROLS.BUTTONS.SHIFT, COLORS.BW.WHITE)
+        self.updateLED(control, COLORS.BW.WHITE)
 
     def OnButtonShiftReleased(self, control, event):
         self.controls.isButtonShiftPressed = False
-        self.updateLED(CONTROLS.BUTTONS.SHIFT)
+        self.updateLED(control)
 
     # mute button
     def OnButtonMutePressed(self, control, event):
         self.controls.isButtonMutePressed = True
-        self.updateLED(CONTROLS.BUTTONS.MUTE, COLORS.RGB.RED)
+        self.updateLED(control, COLORS.RGB.RED)
 
     def OnButtonMuteReleased(self, control, event):
         self.controls.isButtonMutePressed = False
-        self.updateLED(CONTROLS.BUTTONS.MUTE)
+        self.updateLED(control)
 
     # device button -> show/hide/focus channel rack
     def OnButtonDevicePressed(self, control, event):
-        transport.globalTransport(midi.FPT_F6, event.pmeFlags)
+        if not ui.getFocused(midi.widChannelRack) or not ui.getVisible(midi.widChannelRack):
+            transport.globalTransport(midi.FPT_F6, event.pmeFlags)
+        elif self.controls.isButtonShiftPressed and ui.getFocused(midi.widChannelRack):
+            transport.globalTransport(midi.FPT_F6, event.pmeFlags)
 
     # mixer button -> show/hide/focus mixer
     def OnButtonMixPressed(self, control, event):
-        transport.globalTransport(midi.FPT_F9, event.pmeFlags)
+        if not ui.getFocused(midi.widMixer) or not ui.getVisible(midi.widMixer):
+            transport.globalTransport(midi.FPT_F9, event.pmeFlags)
+        elif self.controls.isButtonShiftPressed and ui.getFocused(midi.widMixer):
+            transport.globalTransport(midi.FPT_F9, event.pmeFlags)
 
     # clip button -> show/hide/focus playlist
     def OnButtonClipPressed(self, control, event):
-        transport.globalTransport(midi.FPT_F5, event.pmeFlags)
+        if not ui.getFocused(midi.widPlaylist) or not ui.getVisible(midi.widPlaylist):
+            transport.globalTransport(midi.FPT_F5, event.pmeFlags)
+        elif self.controls.isButtonShiftPressed and ui.getFocused(midi.widPlaylist):
+            transport.globalTransport(midi.FPT_F5, event.pmeFlags)
 
     # browser button -> show/hide/focus browser
     def OnButtonBrowsePressed(self, control, event):
-        print("browser visible", ui.getVisible(midi.widBrowser))
-        print("browser focused", ui.getFocused(midi.widBrowser))
+        pass
+        # ui.showWindow(midi.widBrowser)
+
+    # arrow and select butttons -> navigate and select within browser
+    def OnButtonLeftPressed(self, control, event):
+        self.updateLED(control, COLORS.BW.WHITE)
+        ui.left()
+
+    def OnButtonLeftReleased(self, control, event):
+        self.updateLED(control)
+
+    def OnButtonRightPressed(self, control, event):
+        self.updateLED(control, COLORS.BW.WHITE)
+        ui.right()
+
+    def OnButtonRightReleased(self, control, event):
+        self.updateLED(control)
+
+    def OnButtonUpPressed(self, control, event):
+        self.updateLED(control, COLORS.BW.WHITE)
+        ui.up()
+
+    def OnButtonUpReleased(self, control, event):
+        self.updateLED(control)
+
+    def OnButtonDownPressed(self, control, event):
+        self.updateLED(control, COLORS.BW.WHITE)
+        ui.down()
+
+    def OnButtonDownReleased(self, control, event):
+        self.updateLED(control)
+
+    def OnButtonSelectPressed(self, control, event):
+        self.updateLED(control, COLORS.BW.WHITE)
+        ui.enter()
+
+    def OnButtonSelectReleased(self, control, event):
+        self.updateLED(control)
 
     # layout button
     def OnButtonLayoutPressed(self, control, event):
@@ -422,10 +467,10 @@ class AbletonPush():
                 self.updateLED(CONTROLS.BUTTONS.CLIP)
 
             # browse [browser] button
-            if ui.getFocused(midi.widBrowser):
-                self.updateLED(CONTROLS.BUTTONS.BROWSE, COLORS.BW.WHITE)
-            else:
-                self.updateLED(CONTROLS.BUTTONS.BROWSE)
+            # if ui.getFocused(midi.widBrowser):
+            #     self.updateLED(CONTROLS.BUTTONS.BROWSE, COLORS.BW.WHITE)
+            # else:
+            #     self.updateLED(CONTROLS.BUTTONS.BROWSE)
 
             # layout button
             if ui.getFocused(midi.widPlaylist):
