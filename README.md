@@ -8,7 +8,7 @@ Given the limited set of features implemented so far, at this stage this script 
 - [X] Press Record button to toggle record
 - [X] Press Double Loop button to toggle song/pattern mode
 - [X] Press Quantize button to toggle snap on/off (press Shift + Quantize button to select snap mode)
-- [X] Press Device/Mix/Browse/Clip/Note button to show/hide/focus channel rack/mixer/browser/playlist/piano roll
+- [X] Press Device/Mix/Clip button to show/hide/focus channel rack/mixer/playlist
 - [X] When playlist is focused, press pad to jump to a pattern (flashing red), grid shows up to 64 patterns using 64-pad mode layout, LED matches pattern color the best it can
 - [X] When mixer is focused, press one or more pads to select/deselect the corresponding track (flashing green), grid shows up to 64 tracks using 64-pad mode layout, LED matches track color the best it can
 - [X] When channel rack is focused, press one or more pads to select/deselect the corresponding channel(s) (flashing green), grid shows up to 64 channels using 64-pad mode layout, LED matches channel color the best it can
