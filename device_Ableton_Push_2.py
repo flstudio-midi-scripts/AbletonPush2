@@ -198,6 +198,9 @@ class AbletonPush():
     def OnEncoderMasterTouched(self, control, event):
         if self.controls.isButtonShiftPressed:
             mixer.setTrackVolume(0, 1)
+        if self.controls.isButtonSelectPressed:
+            mixer.deselectAll()
+            mixer.selectTrack(0)
 
     # numbered encoder
     def OnEncoderIncreased(self, control, event):
