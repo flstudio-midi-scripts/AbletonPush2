@@ -58,6 +58,7 @@ class AbletonPush():
     def __init__(self):
         self.controls = AttrDict()
         self.controls.isButtonShiftPressed = False
+        self.controls.isButtonSelectPressed = False
         self.controls.isButtonMutePressed = False
         self.mixer = AttrDict()
         self.mixer.encodersTarget = ENCODERS_NUM_TARGETS.MIXER.TRACK_VOL
@@ -362,10 +363,11 @@ class AbletonPush():
         self.updateLED(control)
 
     def OnButtonSelectPressed(self, control, event):
+        self.controls.isButtonSelectPressed = True
         self.updateLED(control, COLORS.BW.WHITE)
-        ui.enter()
 
     def OnButtonSelectReleased(self, control, event):
+        self.controls.isButtonSelectPressed = False
         self.updateLED(control)
 
     # layout button
@@ -378,12 +380,18 @@ class AbletonPush():
         if ui.getFocused(midi.widMixer):
             if self.controls.isButtonMutePressed:
                 mixer.enableTrack(idx)
+            elif self.controls.isButtonSelectPressed:
+                mixer.selectTrack(idx)
             else:
+                mixer.deselectAll()
                 mixer.selectTrack(idx)
         elif ui.getFocused(midi.widChannelRack):
             if self.controls.isButtonMutePressed:
                 channels.muteChannel(idx)
+            elif self.controls.isButtonSelectPressed:
+                channels.selectChannel(idx)
             else:
+                channels.deselectAll()
                 channels.selectChannel(idx)
         elif ui.getFocused(midi.widPlaylist):
             idx += 1 # TODO figure out why patternNumber starts at one instead of zero!
@@ -543,7 +551,8 @@ class AbletonPush():
                         # elif not patterns.isPatternEnabled(idx):
                         #     self.updateLED(pad, COLORS.RGB.RED, ANIMATIONS.PULSING.HALF)
                         if (idx == patterns.patternNumber()):
-                            self.updateLED(pad, getClosestColor(patterns.getPatternColor(idx)))
+                            # self.updateLED(pad, getClosestColor(patterns.getPatternColor(idx)))
+                            self.updateLED(pad, COLORS.RGB.GREEN)
                             self.updateLED(pad, COLORS.RGB.RED, ANIMATIONS.PULSING.HALF)
                         else:
                             self.updateLED(pad, getClosestColor(patterns.getPatternColor(idx)))
