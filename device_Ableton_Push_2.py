@@ -173,8 +173,9 @@ class AbletonPush():
             if ui.getFocused(midi.widChannelRack):
                 pass # TODO move channel rack grid down
             else:
-                if mixer.trackNumber() < mixer.trackCount():
-                    mixer.setTrackNumber(mixer.trackNumber() + 1)
+                idx = mixer.trackNumber()
+                if idx < mixer.trackCount():
+                    mixer.setTrackNumber(idx + 1)
 
     def OnEncoderTempoDecreased(self, control, event):
         if self.controls.isButtonShiftPressed:
@@ -183,8 +184,9 @@ class AbletonPush():
             if ui.getFocused(midi.widChannelRack):
                 pass # TODO move channel rack grid up
             else:
-                if mixer.trackNumber() > 0:
-                    mixer.setTrackNumber(mixer.trackNumber() - 1)
+                idx = mixer.trackNumber()
+                if idx > 1: # do not include the master track (0)
+                    mixer.setTrackNumber(idx - 1)
 
     # master encoder
     def OnEncoderMasterIncreased(self, control, event):
@@ -378,6 +380,7 @@ class AbletonPush():
     def OnPadPressed(self, control, event):
         idx = CONTROLS.PADS_64.index(control)
         if ui.getFocused(midi.widMixer):
+            idx += 1 # do not include the master track (0)
             if self.controls.isButtonMutePressed:
                 mixer.enableTrack(idx)
             elif self.controls.isButtonSelectPressed:
@@ -517,6 +520,7 @@ class AbletonPush():
             for idx, pad in enumerate(CONTROLS.PADS_64):
                 self.updateLED(pad, 0)
                 if ui.getFocused(midi.widMixer):
+                    idx += 1 # do not include the master track (0)
                     if idx < mixer.trackCount():
                         self.updateLED(pad, getClosestColor(mixer.getTrackColor(idx)))
                         if mixer.isTrackSelected(idx) and not mixer.isTrackEnabled(idx):
