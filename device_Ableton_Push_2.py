@@ -173,14 +173,15 @@ class AbletonPush():
             transport.globalTransport(midi.FPT_TempoJog, 10)
         elif ui.getFocused(midi.widChannelRack):
             idx = channels.channelNumber(1)
-            if idx is None:
+            print(idx)
+            if idx == -1:
                 channels.selectChannel(0, 1)
-            elif idx < channels.channelCount():
+            elif idx < channels.channelCount() - 1:
                 channels.deselectAll()
                 channels.selectChannel(idx + 1, 1)
         elif ui.getFocused(midi.widPlaylist):
             idx = patterns.patternNumber()
-            if idx <= patterns.patternCount(): # TODO figure out why patternNumber starts at one instead of zero!
+            if idx < patterns.patternCount(): # TODO figure out why patternNumber starts at one instead of zero!
                 patterns.jumpToPattern(idx + 1)
         elif ui.getFocused(midi.widMixer):
             idx = mixer.trackNumber()
@@ -192,8 +193,9 @@ class AbletonPush():
             transport.globalTransport(midi.FPT_TempoJog, -10)
         elif ui.getFocused(midi.widChannelRack):
             idx = channels.channelNumber(1)
-            if idx is None:
-                channels.selectChannel(0, 1)
+            print(idx)
+            if idx == -1:
+                channels.selectChannel(channels.channelCount() - 1, 1)
             elif idx > 0:
                 channels.deselectAll()
                 channels.selectChannel(idx - 1, 1)
