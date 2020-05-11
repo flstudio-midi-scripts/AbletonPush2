@@ -141,7 +141,9 @@ class AbletonPush():
     def OnButtonPlayPressed(self, control, event):
         # stop if Shift button is pressed else pause
         if self.controls.isButtonShiftPressed:
-                transport.stop()
+            transport.stop()
+        elif self.controls.isButtonSelectPressed:
+            transport.globalTransport(FPT_AddMarker, event.pmeFlags)
         else:
             transport.start()
 
@@ -169,24 +171,36 @@ class AbletonPush():
     def OnEncoderTempoIncreased(self, control, event):
         if self.controls.isButtonShiftPressed:
             transport.globalTransport(midi.FPT_TempoJog, 10)
-        else:
-            if ui.getFocused(midi.widChannelRack):
-                pass # TODO move channel rack grid down
-            else:
-                idx = mixer.trackNumber()
-                if idx < mixer.trackCount():
-                    mixer.setTrackNumber(idx + 1)
+        elif ui.getFocused(midi.widChannelRack):
+            idx = channels.channelNumber()
+            if idx < channels.channelCount():
+                channels.deselectAll()
+                channels.selectChannel(idx + 1, 1)
+        elif ui.getFocused(midi.widPlaylist):
+            idx = patterns.patternNumber()
+            if idx <= patterns.patternCount(): # TODO figure out why patternNumber starts at one instead of zero!
+                patterns.jumpToPattern(idx + 1)
+        elif ui.getFocused(midi.widMixer):
+            idx = mixer.trackNumber()
+            if idx < mixer.trackCount():
+                mixer.setTrackNumber(idx + 1)
 
     def OnEncoderTempoDecreased(self, control, event):
         if self.controls.isButtonShiftPressed:
             transport.globalTransport(midi.FPT_TempoJog, -10)
-        else:
-            if ui.getFocused(midi.widChannelRack):
-                pass # TODO move channel rack grid up
-            else:
-                idx = mixer.trackNumber()
-                if idx > 1: # do not include the master track (0)
-                    mixer.setTrackNumber(idx - 1)
+        elif ui.getFocused(midi.widChannelRack):
+            idx = channels.channelNumber()
+            if idx > 0:
+                channels.deselectAll()
+                channels.selectChannel(idx - 1, 1)
+        elif ui.getFocused(midi.widPlaylist):
+            idx = patterns.patternNumber()
+            if idx > 1: # TODO figure out why patternNumber starts at one instead of zero!
+                patterns.jumpToPattern(idx - 1)
+        elif ui.getFocused(midi.widMixer):
+            idx = mixer.trackNumber()
+            if idx > 1: # do not include the master track (0)
+                mixer.setTrackNumber(idx - 1)
 
     # master encoder
     def OnEncoderMasterIncreased(self, control, event):
