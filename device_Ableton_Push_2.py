@@ -73,7 +73,7 @@ class AbletonPush():
             self.updateLED(control)
 
     def OnDeInit(self):
-        for control in controls.values():
+        for control in list(CONTROLS.PADS.values()) + list(CONTROLS.BUTTONS.values()):
             self.updateLED(control, 0)
 
     def OnMidiIn(self, event):
