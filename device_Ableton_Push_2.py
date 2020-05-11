@@ -172,8 +172,10 @@ class AbletonPush():
         if self.controls.isButtonShiftPressed:
             transport.globalTransport(midi.FPT_TempoJog, 10)
         elif ui.getFocused(midi.widChannelRack):
-            idx = channels.channelNumber()
-            if idx < channels.channelCount():
+            idx = channels.channelNumber(1)
+            if idx is None:
+                channels.selectChannel(0, 1)
+            elif idx < channels.channelCount():
                 channels.deselectAll()
                 channels.selectChannel(idx + 1, 1)
         elif ui.getFocused(midi.widPlaylist):
@@ -189,8 +191,10 @@ class AbletonPush():
         if self.controls.isButtonShiftPressed:
             transport.globalTransport(midi.FPT_TempoJog, -10)
         elif ui.getFocused(midi.widChannelRack):
-            idx = channels.channelNumber()
-            if idx > 0:
+            idx = channels.channelNumber(1)
+            if idx is None:
+                channels.selectChannel(0, 1)
+            elif idx > 0:
                 channels.deselectAll()
                 channels.selectChannel(idx - 1, 1)
         elif ui.getFocused(midi.widPlaylist):
